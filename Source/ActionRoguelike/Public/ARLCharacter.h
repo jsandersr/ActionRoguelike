@@ -18,8 +18,14 @@ public:
 	// Sets default values for this character's properties
 	AARLCharacter();
 
-protected:
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+protected:
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp = nullptr;
 
@@ -29,13 +35,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Moves character forward based on Value (which moves backward if negative).
 	void MoveForward(float Value);
+
+	// Strafes character right based on Value (which strafes left if negative).
 	void MoveRight(float Value);
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };

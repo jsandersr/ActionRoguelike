@@ -19,23 +19,6 @@ AARLCharacter::AARLCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 }
 
-// Called when the game starts or when spawned
-void AARLCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void AARLCharacter::MoveForward(float Value)
-{
-	AddMovementInput(GetActorForwardVector(), Value);
-}
-
-void AARLCharacter::MoveRight(float Value)
-{
-	AddMovementInput(GetActorRightVector(), Value);
-}
-
 // Called every frame
 void AARLCharacter::Tick(float DeltaTime)
 {
@@ -54,4 +37,21 @@ void AARLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+}
+
+// Called when the game starts or when spawned
+void AARLCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+void AARLCharacter::MoveForward(float Value)
+{
+	AddMovementInput(GetActorForwardVector(), Value);
+}
+
+void AARLCharacter::MoveRight(float Value)
+{
+	AddMovementInput(GetActorRightVector(), Value);
 }
