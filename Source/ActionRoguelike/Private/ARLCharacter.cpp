@@ -43,6 +43,8 @@ void AARLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AARLCharacter::PrimaryAttack);
 }
 
 // Called when the game starts or when spawned
@@ -79,4 +81,21 @@ void AARLCharacter::MoveRight(float Value)
 	FVector RightVector = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
 
 	AddMovementInput(RightVector, Value);
+}
+
+void AARLCharacter::PrimaryAttack()
+{
+
+	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
+	// Control location is "where are we looking"
+	FTransform SpawnTransformMatrix = FTransform{ GetControlRotation(), HandLocation };
+
+	// This is so we don't have issues spawning inside of ourself.
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	// Spawning is always done through the world.
+	// Projectile class will be specified through a blueprint.
+	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransformMatrix, SpawnParams);
 }

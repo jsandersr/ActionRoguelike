@@ -26,9 +26,15 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
+	// This is a projectile that we will spawn.
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ProjectileClass;
+
+	// Camera attaches to this.
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp = nullptr;
 
+	// Camera that the "player" sees through.
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp = nullptr;
 
@@ -40,4 +46,6 @@ protected:
 
 	// Strafes character right based on Value (which strafes left if negative).
 	void MoveRight(float Value);
+
+	void PrimaryAttack();
 };
