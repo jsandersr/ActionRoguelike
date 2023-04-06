@@ -26,6 +26,20 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	// Moves character forward based on Value (which moves backward if negative).
+	void MoveForward(float Value);
+
+	// Strafes character right based on Value (which strafes left if negative).
+	void MoveRight(float Value);
+
+	// Uses character's primary attack.
+	void PrimaryAttack();
+
+protected:
 	// This is a projectile that we will spawn.
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ProjectileClass;
@@ -37,15 +51,4 @@ protected:
 	// Camera that the "player" sees through.
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp = nullptr;
-
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	// Moves character forward based on Value (which moves backward if negative).
-	void MoveForward(float Value);
-
-	// Strafes character right based on Value (which strafes left if negative).
-	void MoveRight(float Value);
-
-	void PrimaryAttack();
 };

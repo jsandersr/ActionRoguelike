@@ -28,12 +28,16 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* SphereComp;
 
+	// Our collision sphere.
 	UPROPERTY(VisibleAnywhere)
-	UProjectileMovementComponent* MovementComp;
+	USphereComponent* SphereComp = nullptr;
 
+	// Responsible for our movement.
 	UPROPERTY(VisibleAnywhere)
-	UParticleSystemComponent* EffectComp;
+	UProjectileMovementComponent* MovementComp = nullptr;
+
+	// VFX component.
+	UPROPERTY(VisibleAnywhere)
+	UParticleSystemComponent* EffectComp = nullptr;
 };
