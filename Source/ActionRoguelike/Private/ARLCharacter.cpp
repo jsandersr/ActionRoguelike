@@ -6,6 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ARLInteractionComponent.h"
 
 // Sets default values
 AARLCharacter::AARLCharacter()
@@ -19,6 +20,8 @@ AARLCharacter::AARLCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	InteractionComp = CreateDefaultSubobject<UARLInteractionComponent>("InteractionComp");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
@@ -47,6 +50,7 @@ void AARLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AARLCharacter::PrimaryAttack);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AARLCharacter::PrimaryInteract);
 }
 
 // Called when the game starts or when spawned
@@ -100,4 +104,10 @@ void AARLCharacter::PrimaryAttack()
 	// Spawning is always done through the world.
 	// Projectile class will be specified through a blueprint.
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransformMatrix, SpawnParams);
+}
+
+void AARLCharacter::PrimaryInteract()
+{
+	check(InteractionComp);
+	InteractionComp->PrimaryInteract();
 }

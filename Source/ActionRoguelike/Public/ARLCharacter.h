@@ -8,6 +8,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class UARLInteractionComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API AARLCharacter : public ACharacter
@@ -39,6 +40,8 @@ protected:
 	// Uses character's primary attack.
 	void PrimaryAttack();
 
+	void PrimaryInteract();
+
 protected:
 	// This is a projectile that we will spawn.
 	UPROPERTY(EditAnywhere)
@@ -51,4 +54,7 @@ protected:
 	// Camera that the "player" sees through.
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	UARLInteractionComponent* InteractionComp = nullptr;
 };
