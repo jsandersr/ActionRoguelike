@@ -9,6 +9,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UARLInteractionComponent;
+class UAnimMontage;
 
 UCLASS()
 class ACTIONROGUELIKE_API AARLCharacter : public ACharacter
@@ -40,12 +41,22 @@ protected:
 	// Uses character's primary attack.
 	void PrimaryAttack();
 
+	void PrimaryAttack_TimeElapsed();
+
 	void PrimaryInteract();
 
 protected:
 	// This is a projectile that we will spawn.
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
+
+	// This is the animation that will play when we attack.
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UAnimMontage* AttackAnim = nullptr;
+
+	// This is the delay between attacks.
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float PrimaryAttackDelaySeconds = 0.2f;
 
 	// Camera attaches to this.
 	UPROPERTY(VisibleAnywhere)
@@ -57,4 +68,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UARLInteractionComponent* InteractionComp = nullptr;
+
+private:
+	// This is the timer that will be used to spawn projectiles.
+	FTimerHandle TimerHandle_PrimaryAttack;
 };

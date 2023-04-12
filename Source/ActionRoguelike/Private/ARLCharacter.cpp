@@ -91,7 +91,17 @@ void AARLCharacter::MoveRight(float Value)
 
 void AARLCharacter::PrimaryAttack()
 {
+	PlayAnimMontage(AttackAnim);
 
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this,
+		&AARLCharacter::PrimaryAttack_TimeElapsed, PrimaryAttackDelaySeconds, false);
+
+	// This is how you'd stop in-flight events from happening. You need its handle.
+	//GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack)
+}
+
+void AARLCharacter::PrimaryAttack_TimeElapsed()
+{
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
 	// Control location is "where are we looking"
