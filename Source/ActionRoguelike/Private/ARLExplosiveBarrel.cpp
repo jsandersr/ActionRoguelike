@@ -16,7 +16,10 @@ AARLExplosiveBarrel::AARLExplosiveBarrel()
 	RadialForceComp = CreateDefaultSubobject<URadialForceComponent>("RadialForceComp");
 	RadialForceComp->SetupAttachment(RootComponent);
 	RadialForceComp->SetWorldLocation(GetActorLocation());
-	RadialForceComp->bAutoActivate = true;
+
+	RadialForceComp->SetAutoActivate(false);
+
+	// If true, it ignores the mass of other objects.
 	RadialForceComp->bImpulseVelChange = true;
 	RadialForceComp->Radius = ExplosionRadius;
 	RadialForceComp->ImpulseStrength = ExplosionStrength;
@@ -26,6 +29,12 @@ AARLExplosiveBarrel::AARLExplosiveBarrel()
 void AARLExplosiveBarrel::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AARLExplosiveBarrel::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
 	MeshComp->OnComponentHit.AddDynamic(this, &AARLExplosiveBarrel::OnHit);
 }
 
