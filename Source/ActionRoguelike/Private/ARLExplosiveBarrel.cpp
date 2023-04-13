@@ -42,6 +42,18 @@ void AARLExplosiveBarrel::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	RadialForceComp->FireImpulse();
+
+	UE_LOG(LogTemp, Log, TEXT("OnActorHit in Explosive Barrel"));
+
+	// %s is a placeholder for a string.
+	// %f is a placeholder for a float.
+	// logs: OtherActor: BP_PlayerCharacter_C_0, at game time: 0.000000
+	UE_LOG(LogTemp, Warning, TEXT("OtherActor: %s, at game time: %f"),
+		*GetNameSafe(OtherActor), GetWorld()->TimeSeconds);
+
+	FString LogString = FString::Printf(TEXT("Hit at location: %s"), *Hit.ImpactPoint.ToString());
+
+	DrawDebugString(GetWorld(), Hit.ImpactPoint, LogString, nullptr, FColor::Green, 2.0f, true);
 }
 
 // Called every frame

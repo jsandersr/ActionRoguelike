@@ -117,6 +117,6 @@ void AARLCharacter::PrimaryAttack_TimeElapsed()
 
 void AARLCharacter::PrimaryInteract()
 {
-	check(InteractionComp);
+	ensureAlways(InteractionComp);
 	InteractionComp->PrimaryInteract();
 }
