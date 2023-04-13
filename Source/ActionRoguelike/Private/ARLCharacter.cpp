@@ -42,15 +42,13 @@ void AARLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AARLCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AARLCharacter::MoveRight);
-
-
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AARLCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AARLCharacter::PrimaryInteract);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AARLCharacter::PrimaryInteract);
 }
 
 // Called when the game starts or when spawned
@@ -110,6 +108,7 @@ void AARLCharacter::PrimaryAttack_TimeElapsed()
 	// This is so we don't have issues spawning inside of ourself.
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
 
 	// Spawning is always done through the world.
 	// Projectile class will be specified through a blueprint.
