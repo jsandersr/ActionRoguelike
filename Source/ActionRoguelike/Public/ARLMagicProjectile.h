@@ -30,14 +30,14 @@ protected:
 protected:
 
 	// Our collision sphere.
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USphereComponent* SphereComp = nullptr;
 
 	// Responsible for our movement.
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UProjectileMovementComponent* MovementComp = nullptr;
 
 	// VFX component.
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* EffectComp = nullptr;
 };
