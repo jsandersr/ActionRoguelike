@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ARLInteractionComponent.h"
+#include "ARLAttributeComponent.h"
 
 // Sets default values
 AARLCharacter::AARLCharacter()
@@ -22,6 +23,7 @@ AARLCharacter::AARLCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	InteractionComp = CreateDefaultSubobject<UARLInteractionComponent>("InteractionComp");
+	AttributeComp = CreateDefaultSubobject<UARLAttributeComponent>("AttributeComp");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
@@ -32,7 +34,6 @@ AARLCharacter::AARLCharacter()
 void AARLCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input

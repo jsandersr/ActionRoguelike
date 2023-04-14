@@ -10,6 +10,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UARLInteractionComponent;
 class UAnimMontage;
+class UARLAttributeComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API AARLCharacter : public ACharacter
@@ -59,15 +60,18 @@ protected:
 	float PrimaryAttackDelaySeconds = 0.2f;
 
 	// Camera attaches to this.
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Component")
 	USpringArmComponent* SpringArmComp = nullptr;
 
 	// Camera that the "player" sees through.
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Component")
 	UCameraComponent* CameraComp = nullptr;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Component")
 	UARLInteractionComponent* InteractionComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	UARLAttributeComponent* AttributeComp = nullptr;
 
 private:
 	// This is the timer that will be used to spawn projectiles.

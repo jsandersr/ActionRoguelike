@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "ARLAttributeComponent.h"
 
 // Sets default values
 AARLMagicProjectile::AARLMagicProjectile()
@@ -22,7 +23,7 @@ AARLMagicProjectile::AARLMagicProjectile()
 
 	// We can use a collision profile specific to projectiles.
 	SphereComp->SetCollisionProfileName("Projectile");
-
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AARLMagicProjectile::OnActorOverlap);
 	RootComponent = SphereComp;
 
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
@@ -38,6 +39,23 @@ AARLMagicProjectile::AARLMagicProjectile()
 void AARLMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AARLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OtherActor)
+		return;
+
+	UARLAttributeComponent* AttributeComp =
+		Cast<UARLAttributeComponent>(OtherActor->GetComponentByClass(UARLAttributeComponent::StaticClass()));
+	if (AttributeComp)
+	{
+		// TODO: don't hard code the health amount.
+		AttributeComp->ApplyHealthChange(-20.0f);
+		Destroy();
+	}
 }
 
 // Called every frame
