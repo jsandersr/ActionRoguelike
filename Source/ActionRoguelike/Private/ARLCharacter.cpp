@@ -123,9 +123,12 @@ void AARLCharacter::PrimaryAttack_TimeElapsed()
 
 	FVector TraceStart = CameraComp->GetComponentLocation();
 
+	const float TraceLineLengthCM = 5000.0f;
 	// Endpoint far into the look-at distance. Not too far, still adjust somewhat towards the
 	// crosshair on a miss.
-	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * 5000.0f);
+
+	// TODO: Figure out how to introduce accuracy variations.
+	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * TraceLineLengthCM);
 
 	FHitResult HitResult;
 	// Returns true if we got a blocking hit.
