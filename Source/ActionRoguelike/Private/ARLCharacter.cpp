@@ -101,18 +101,49 @@ void AARLCharacter::PrimaryAttack()
 
 void AARLCharacter::PrimaryAttack_TimeElapsed()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-
 	// Control location is "where are we looking"
-	FTransform SpawnTransformMatrix = FTransform{ GetControlRotation(), HandLocation };
+	//FTransform SpawnTransformMatrix = FTransform{ GetControlRotation(), HandLocation };
 
 	// This is so we don't have issues spawning inside of ourself.
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
 
+	FCollisionShape Shape;
+	Shape.SetSphere(20.0f);
+
+	//Ignore Player;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	FCollisionObjectQueryParams ObjParams;
+	ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	ObjParams.AddObjectTypesToQuery(ECC_Pawn);
+
+	FVector TraceStart = CameraComp->GetComponentLocation();
+
+	// Endpoint far into the look-at distance. Not too far, still adjust somewhat towards the
+	// crosshair on a miss.
+	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * 5000.0f);
+
+	FHitResult HitResult;
+	// Returns true if we got a blocking hit.
+	if (GetWorld()->SweepSingleByObjectType(HitResult, TraceStart, TraceEnd,
+		FQuat::Identity, ObjParams, Shape, Params))
+	{
+		TraceEnd = HitResult.ImpactPoint;
+	}
+
+	// Now we trace from our hand location.
+	TraceStart = GetMesh()->GetSocketLocation("Muzzle_01");
+
+	// We will find a new direction/rotation that points from the hand to the impact point.
+	FRotator ProjectileRotation = FRotationMatrix::MakeFromX(TraceEnd - TraceStart).Rotator();
+
 	// Spawning is always done through the world.
 	// Projectile class will be specified through a blueprint.
+	FTransform SpawnTransformMatrix = FTransform{ ProjectileRotation, TraceStart };
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransformMatrix, SpawnParams);
 }
 
