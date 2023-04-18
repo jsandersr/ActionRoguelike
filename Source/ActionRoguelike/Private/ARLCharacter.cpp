@@ -46,8 +46,11 @@ void AARLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
-	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AARLCharacter::PrimaryAttack);
-	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AARLCharacter::PrimaryInteract);
+	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AARLCharacter::UsePrimaryInteract);
+
+	PlayerInputComponent->BindAction("PrimaryAbility", IE_Pressed, this, &AARLCharacter::UsePrimaryAbility);
+	PlayerInputComponent->BindAction("TeleportAbility", IE_Pressed, this, &AARLCharacter::UseTeleportAbility);
+	PlayerInputComponent->BindAction("BlackHoleAbility", IE_Pressed, this, &AARLCharacter::UseBlackHoleAbility);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 }
@@ -56,7 +59,6 @@ void AARLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 void AARLCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void AARLCharacter::MoveForward(float Value)
@@ -88,21 +90,62 @@ void AARLCharacter::MoveRight(float Value)
 	AddMovementInput(RightVector, Value);
 }
 
-void AARLCharacter::PrimaryAttack()
+void AARLCharacter::UsePrimaryAbility()
 {
 	PlayAnimMontage(AttackAnim);
 
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this,
-		&AARLCharacter::PrimaryAttack_TimeElapsed, PrimaryAttackDelaySeconds, false);
+		&AARLCharacter::OnPrimaryAbility_TimeElapsed, PrimaryAttackAbilityDelaySeconds, false);
 
 	// This is how you'd stop in-flight events from happening. You need its handle.
 	//GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack)
 }
 
-void AARLCharacter::PrimaryAttack_TimeElapsed()
+void AARLCharacter::OnPrimaryAbility_TimeElapsed()
 {
 	// Control location is "where are we looking"
 	//FTransform SpawnTransformMatrix = FTransform{ GetControlRotation(), HandLocation };
+
+	SpawnProjectile(AttackAbilityProjectileClass);
+}
+
+void AARLCharacter::UseTeleportAbility()
+{
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_TeleportAbility, this,
+		&AARLCharacter::OnTeleportAbility_TimeElapsed, TeleportAbilityDelaySeconds, false);
+}
+
+void AARLCharacter::OnTeleportAbility_TimeElapsed()
+{
+	SpawnProjectile(TeleportAbilityProjectileClass);
+}
+
+void AARLCharacter::UseBlackHoleAbility()
+{
+	PlayAnimMontage(AttackAnim);
+	GetWorldTimerManager().SetTimer(TimerHandle_BlackHoleAttack, this,
+		&AARLCharacter::OnBlackHoleAbility_TimeElapsed, BlackHoleAbilityDelaySeconds, false);
+}
+
+void AARLCharacter::OnBlackHoleAbility_TimeElapsed()
+{
+	SpawnProjectile(BlackHoleAbilityProjectileClass);
+}
+
+void AARLCharacter::UsePrimaryInteract()
+{
+	ensureAlways(InteractionComp);
+	InteractionComp->PrimaryInteract();
+}
+
+void AARLCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
+{
+	if (!ensureAlways(ClassToSpawn))
+	{
+		return;
+	}
 
 	// This is so we don't have issues spawning inside of ourself.
 	FActorSpawnParameters SpawnParams;
@@ -124,9 +167,9 @@ void AARLCharacter::PrimaryAttack_TimeElapsed()
 	FVector TraceStart = CameraComp->GetComponentLocation();
 
 	const float TraceLineLengthCM = 5000.0f;
+
 	// Endpoint far into the look-at distance. Not too far, still adjust somewhat towards the
 	// crosshair on a miss.
-
 	// TODO: Figure out how to introduce accuracy variations.
 	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * TraceLineLengthCM);
 
@@ -147,11 +190,5 @@ void AARLCharacter::PrimaryAttack_TimeElapsed()
 	// Spawning is always done through the world.
 	// Projectile class will be specified through a blueprint.
 	FTransform SpawnTransformMatrix = FTransform{ ProjectileRotation, TraceStart };
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransformMatrix, SpawnParams);
-}
-
-void AARLCharacter::PrimaryInteract()
-{
-	ensureAlways(InteractionComp);
-	InteractionComp->PrimaryInteract();
+	GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTransformMatrix, SpawnParams);
 }

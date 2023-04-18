@@ -40,24 +40,45 @@ protected:
 	void MoveRight(float Value);
 
 	// Uses character's primary attack.
-	void PrimaryAttack();
+	void UsePrimaryAbility();
 
-	void PrimaryAttack_TimeElapsed();
+	void OnPrimaryAbility_TimeElapsed();
 
-	void PrimaryInteract();
+	void UseTeleportAbility();
+	
+	void OnTeleportAbility_TimeElapsed();
+
+	void UseBlackHoleAbility();
+
+	void OnBlackHoleAbility_TimeElapsed();
+
+	void UsePrimaryInteract();
+
+	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 
 protected:
 	// This is a projectile that we will spawn.
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> ProjectileClass;
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	TSubclassOf<AActor> AttackAbilityProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	TSubclassOf<AActor> TeleportAbilityProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	TSubclassOf<AActor> BlackHoleAbilityProjectileClass;
 
 	// This is the animation that will play when we attack.
-	UPROPERTY(EditAnywhere, Category = "Attack")
+	UPROPERTY(EditAnywhere, Category = "Ability")
 	UAnimMontage* AttackAnim = nullptr;
 
-	// This is the delay between attacks.
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	float PrimaryAttackDelaySeconds = 0.2f;
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	float PrimaryAttackAbilityDelaySeconds = 0.2f;
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	float TeleportAbilityDelaySeconds = 0.2f;
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	float BlackHoleAbilityDelaySeconds = 0.2f;
 
 	// Camera attaches to this.
 	UPROPERTY(VisibleAnywhere, Category = "Component")
@@ -74,6 +95,12 @@ protected:
 	UARLAttributeComponent* AttributeComp = nullptr;
 
 private:
-	// This is the timer that will be used to spawn projectiles.
+	// The timer that will be used to trigger the primary attack.
 	FTimerHandle TimerHandle_PrimaryAttack;
+
+	// The timer that will be trigger the teleport ability.
+	FTimerHandle TimerHandle_TeleportAbility;
+
+	// The timer that will be used to trigger the black hole attack.
+	FTimerHandle TimerHandle_BlackHoleAttack;
 };

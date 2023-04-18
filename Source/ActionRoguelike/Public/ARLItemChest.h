@@ -37,7 +37,7 @@ protected:
 	UStaticMeshComponent* LidMesh = nullptr;
 
 private:
-	// This weirdness is because we made it a BlueprintNativeEvent in the interface.
+	// BlueprintNativeEvent expects <function name>_Implementation.
 	void Interact_Implementation(APawn* InstigatorPawn);
 
 };
