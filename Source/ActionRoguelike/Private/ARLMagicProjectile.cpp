@@ -15,6 +15,11 @@ AARLMagicProjectile::AARLMagicProjectile()
 	// Only interested in overlapping with pawn example:
 	// SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	MovementComp->InitialSpeed = 3000.0f;
+}
+
+void AARLMagicProjectile::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AARLMagicProjectile::OnActorOverlap);
 }
 
@@ -22,15 +27,18 @@ void AARLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!OtherActor)
+	if (!OtherActor || OtherActor == GetInstigator())
 		return;
 
 	UARLAttributeComponent* AttributeComp =
 		Cast<UARLAttributeComponent>(OtherActor->GetComponentByClass(UARLAttributeComponent::StaticClass()));
+
 	if (AttributeComp)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Taking 20 damage"));
 		// TODO: don't hard code the health amount.
 		AttributeComp->ApplyHealthChange(-20.0f);
+		ExecuteEffect();
 		Destroy();
 	}
 }

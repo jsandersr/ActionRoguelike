@@ -6,28 +6,20 @@
 // Sets default values for this component's properties
 UARLAttributeComponent::UARLAttributeComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
 	Health = MaxHealth;
 }
 
 bool UARLAttributeComponent::ApplyHealthChange(float DeltaHealth)
 {
+	float CurrentHealth = Health;
 	Health = FMath::Clamp(Health + DeltaHealth, 0.0f, MaxHealth);
-	return Health <= 0.0f;
+
+	bool bDidHealthChange = CurrentHealth != Health;
+	if (bDidHealthChange)
+	{
+		OnHealthChanged.Broadcast(GetOwner(), this, Health, DeltaHealth);
+	}
+
+	return bDidHealthChange;
 }
 
-// Called when the game starts
-void UARLAttributeComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-// Called every frame
-void UARLAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}

@@ -81,17 +81,17 @@ protected:
 	float BlackHoleAbilityDelaySeconds = 0.2f;
 
 	// Camera attaches to this.
-	UPROPERTY(VisibleAnywhere, Category = "Component")
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USpringArmComponent* SpringArmComp = nullptr;
 
 	// Camera that the "player" sees through.
-	UPROPERTY(VisibleAnywhere, Category = "Component")
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UCameraComponent* CameraComp = nullptr;
 
-	UPROPERTY(VisibleAnywhere, Category = "Component")
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UARLInteractionComponent* InteractionComp = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UARLAttributeComponent* AttributeComp = nullptr;
 
 private:

@@ -5,6 +5,7 @@
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ARLInteractionComponent.h"
 #include "ARLAttributeComponent.h"
@@ -24,7 +25,9 @@ AARLCharacter::AARLCharacter()
 
 	InteractionComp = CreateDefaultSubobject<UARLInteractionComponent>("InteractionComp");
 	AttributeComp = CreateDefaultSubobject<UARLAttributeComponent>("AttributeComp");
+	GetMesh()->SetGenerateOverlapEvents(true);
 
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
@@ -106,7 +109,18 @@ void AARLCharacter::OnPrimaryAbility_TimeElapsed()
 	// Control location is "where are we looking"
 	//FTransform SpawnTransformMatrix = FTransform{ GetControlRotation(), HandLocation };
 
-	SpawnProjectile(AttackAbilityProjectileClass);
+	if (ensure(AttackAbilityProjectileClass))
+	{
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FTransform SpawnTM = FTransform{ GetControlRotation(), HandLocation };
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+
+		GetWorld()->SpawnActor<AActor>(AttackAbilityProjectileClass, SpawnTM, SpawnParams);
+	}
+	
 }
 
 void AARLCharacter::UseTeleportAbility()

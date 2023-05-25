@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "ARLAttributeComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, UARLAttributeComponent*, OwningComp, float, NewHealth, float, DeltaHealth);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROGUELIKE_API UARLAttributeComponent : public UActorComponent
@@ -20,12 +21,9 @@ public:
 	bool ApplyHealthChange(float DeltaHealth);
 
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY(BlueprintAssignable, Category = "Attributes")
+	FOnHealthChanged OnHealthChanged;
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
 protected:
 	// EditAnywhere - edit in BP editor and per-instance level.
