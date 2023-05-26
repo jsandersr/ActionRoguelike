@@ -2,11 +2,13 @@
 
 
 #include "ARLAttributeComponent.h"
+#include "Runtime/Core/Public/Delegates/Delegate.h"
 
 // Sets default values for this component's properties
 UARLAttributeComponent::UARLAttributeComponent()
 {
 	Health = MaxHealth;
+	OnHealthChanged.AddDynamic(this, &UARLAttributeComponent::HandleOnHealthChanged);
 }
 
 bool UARLAttributeComponent::ApplyHealthChange(float DeltaHealth)
@@ -22,4 +24,8 @@ bool UARLAttributeComponent::ApplyHealthChange(float DeltaHealth)
 
 	return bDidHealthChange;
 }
-
+void UARLAttributeComponent::HandleOnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp,
+	float NewHealth, float DeltaHealth)
+{
+	// Example of how to connect to a delegate with a member function.
+}

@@ -22,7 +22,7 @@ public:
 
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Attributes")
-	FOnHealthChanged OnHealthChanged;
+		FOnHealthChanged OnHealthChanged;
 
 
 protected:
@@ -39,4 +39,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float MaxHealth = 100.f;
+
+private:
+	UFUNCTION()
+	void HandleOnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp, float NewHealth, float DeltaHealth);
 };
