@@ -17,13 +17,17 @@ public:
 	// Sets default values for this component's properties
 	UARLAttributeComponent();
 
+	// Called to apply a change to the health of the owning actor.
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(float DeltaHealth);
 
-public:
+	// Delegate event that notifies when health changes.
 	UPROPERTY(BlueprintAssignable, Category = "Attributes")
-		FOnHealthChanged OnHealthChanged;
+	FOnHealthChanged OnHealthChanged;
 
+public:
+	// Any sort of pregame hookups should be done here, not in the constructor.
+	virtual void InitializeComponent() override;
 
 protected:
 	// EditAnywhere - edit in BP editor and per-instance level.
@@ -34,13 +38,16 @@ protected:
 	// BlueprintReadWrite - read-write access in Blueprints
 	// Category = "" display only for detail panels and blueprint context menu.
 
+	// Health of the owning actor.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float Health = 0.0f;
 
+	// Max health of the owning actor.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
-	float MaxHealth = 100.f;
+	float HealthMax = 100.f;
 
 private:
+	// Handles health change events. (NYI, just an example).
 	UFUNCTION()
 	void HandleOnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp, float NewHealth, float DeltaHealth);
 };

@@ -6,15 +6,14 @@
 
 // Sets default values for this component's properties
 UARLAttributeComponent::UARLAttributeComponent()
+	: Health(HealthMax)
 {
-	Health = MaxHealth;
-	OnHealthChanged.AddDynamic(this, &UARLAttributeComponent::HandleOnHealthChanged);
 }
 
 bool UARLAttributeComponent::ApplyHealthChange(float DeltaHealth)
 {
 	float CurrentHealth = Health;
-	Health = FMath::Clamp(Health + DeltaHealth, 0.0f, MaxHealth);
+	Health = FMath::Clamp(Health + DeltaHealth, 0.0f, HealthMax);
 
 	bool bDidHealthChange = CurrentHealth != Health;
 	if (bDidHealthChange)
@@ -24,6 +23,14 @@ bool UARLAttributeComponent::ApplyHealthChange(float DeltaHealth)
 
 	return bDidHealthChange;
 }
+
+void UARLAttributeComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	OnHealthChanged.AddDynamic(this, &UARLAttributeComponent::HandleOnHealthChanged);
+}
+
 void UARLAttributeComponent::HandleOnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp,
 	float NewHealth, float DeltaHealth)
 {
