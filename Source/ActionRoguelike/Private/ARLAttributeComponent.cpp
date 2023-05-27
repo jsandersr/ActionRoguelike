@@ -4,9 +4,12 @@
 #include "ARLAttributeComponent.h"
 #include "Runtime/Core/Public/Delegates/Delegate.h"
 
+static const float SHealthMax = 100.f;
+
 // Sets default values for this component's properties
 UARLAttributeComponent::UARLAttributeComponent()
-	: Health(HealthMax)
+	: Health(SHealthMax)
+	, HealthMax(SHealthMax)
 {
 }
 

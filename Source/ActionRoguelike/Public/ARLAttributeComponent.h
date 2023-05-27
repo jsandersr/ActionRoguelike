@@ -40,11 +40,11 @@ protected:
 
 	// Health of the owning actor.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
-	float Health = 0.0f;
+	float Health;
 
 	// Max health of the owning actor.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
-	float HealthMax = 100.f;
+	float HealthMax;
 
 private:
 	// Handles health change events. (NYI, just an example).
