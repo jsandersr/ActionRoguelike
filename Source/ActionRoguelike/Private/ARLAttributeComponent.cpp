@@ -21,7 +21,7 @@ bool UARLAttributeComponent::ApplyHealthChange(float DeltaHealth)
 	bool bDidHealthChange = CurrentHealth != Health;
 	if (bDidHealthChange)
 	{
-		OnHealthChanged.Broadcast(GetOwner(), this, Health, DeltaHealth);
+		HealthChangedSignal.Broadcast(GetOwner(), this, Health, DeltaHealth);
 	}
 
 	return bDidHealthChange;
@@ -31,7 +31,7 @@ void UARLAttributeComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	OnHealthChanged.AddDynamic(this, &UARLAttributeComponent::HandleOnHealthChanged);
+	HealthChangedSignal.AddDynamic(this, &UARLAttributeComponent::HandleOnHealthChanged);
 }
 
 void UARLAttributeComponent::HandleOnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp,

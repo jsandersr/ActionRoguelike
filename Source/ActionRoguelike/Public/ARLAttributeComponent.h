@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "ARLAttributeComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, UARLAttributeComponent*, OwningComp, float, NewHealth, float, DeltaHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FHealthChangedSignal, AActor*, InstigatorActor, UARLAttributeComponent*, OwningComp, float, NewHealth, float, DeltaHealth);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROGUELIKE_API UARLAttributeComponent : public UActorComponent
@@ -23,7 +23,7 @@ public:
 
 	// Delegate event that notifies when health changes.
 	UPROPERTY(BlueprintAssignable, Category = "Attributes")
-	FOnHealthChanged OnHealthChanged;
+	FHealthChangedSignal HealthChangedSignal;
 
 public:
 	// Any sort of pregame hookups should be done here, not in the constructor.
@@ -49,5 +49,6 @@ protected:
 private:
 	// Handles health change events. (NYI, just an example).
 	UFUNCTION()
-	void HandleOnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp, float NewHealth, float DeltaHealth);
+	void HandleOnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp,
+		float NewHealth, float DeltaHealth);
 };
