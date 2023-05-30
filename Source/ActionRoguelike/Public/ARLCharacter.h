@@ -33,6 +33,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Any sort of pregame hookups should be done here, not in the constructor.
+	virtual void PostInitializeComponents() override;
+
 	// Moves character forward based on Value (which moves backward if negative).
 	void MoveForward(float Value);
 
@@ -55,6 +58,10 @@ protected:
 	void UsePrimaryInteract();
 
 	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp,
+		float NewHealth, float DeltaHealth);
 
 protected:
 	// This is a projectile that we will spawn.

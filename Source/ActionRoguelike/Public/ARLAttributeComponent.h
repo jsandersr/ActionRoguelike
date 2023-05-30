@@ -25,6 +25,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Attributes")
 	FHealthChangedSignal HealthChangedSignal;
 
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool IsAlive() const { return Health > 0.0f; }
+
 public:
 	// Any sort of pregame hookups should be done here, not in the constructor.
 	virtual void InitializeComponent() override;

@@ -64,6 +64,13 @@ void AARLCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AARLCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->HealthChangedSignal.AddDynamic(this, &AARLCharacter::OnHealthChanged);
+}
+
 void AARLCharacter::MoveForward(float Value)
 {
 	// We want to move in the direction of the camera. Ex. Camera is looking to the left, rotate in that direction.
@@ -205,4 +212,13 @@ void AARLCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 	// Projectile class will be specified through a blueprint.
 	FTransform SpawnTransformMatrix = FTransform{ ProjectileRotation, TraceStart };
 	GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTransformMatrix, SpawnParams);
+}
+
+void AARLCharacter::OnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp, float NewHealth, float DeltaHealth)
+{
+	if (NewHealth <= 0.0f && DeltaHealth < 0.0f)
+	{
+		APlayerController* PlayerController =  Cast<APlayerController>(GetController());
+		DisableInput(PlayerController);
+	}
 }
