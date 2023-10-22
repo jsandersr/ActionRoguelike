@@ -9,14 +9,16 @@ void AARLAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ensure(AIBehaviorTree);
-
-	RunBehaviorTree(AIBehaviorTree);
-
-	// PLACEHOLDER: This is not what you would normally do.
-	APawn* MyPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (MyPawn)
+	if (ensureMsgf(AIBehaviorTree,
+		TEXT("Behavior Tree is nullptr! Please assign BehaviorTree in your AI Controller")))
 	{
-		GetBlackboardComponent()->SetValueAsObject("TargetActor", MyPawn);
+		RunBehaviorTree(AIBehaviorTree);
 	}
+
+	//// PLACEHOLDER: This is not what you would normally do.
+	//APawn* MyPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	//if (MyPawn)
+	//{
+	//	GetBlackboardComponent()->SetValueAsObject("TargetActor", MyPawn);
+	//}
 }

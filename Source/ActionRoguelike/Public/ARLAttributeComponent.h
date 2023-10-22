@@ -14,12 +14,20 @@ class ACTIONROGUELIKE_API UARLAttributeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	static UARLAttributeComponent* GetAttributeComponentFromActor(AActor* FromActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes", meta = (Display = "IsAlive"))
+	static bool IsActorAlive(AActor* Actor);
+
+
 	// Sets default values for this component's properties
 	UARLAttributeComponent();
 
 	// Called to apply a change to the health of the owning actor.
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool ApplyHealthChange(float DeltaHealth);
+	bool ApplyHealthChange(AActor* InstigatorActor, float DeltaHealth);
 
 	// Delegate event that notifies when health changes.
 	UPROPERTY(BlueprintAssignable, Category = "Attributes")
@@ -27,6 +35,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool IsAlive() const { return Health > 0.0f; }
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetHealth() const { return Health; }
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetHealthMax() const { return HealthMax; }
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool IsFullHealth() const { return Health >= HealthMax; }
+
 
 public:
 	// Any sort of pregame hookups should be done here, not in the constructor.

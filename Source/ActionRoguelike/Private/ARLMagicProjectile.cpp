@@ -37,7 +37,7 @@ void AARLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Taking 20 damage"));
 		// TODO: don't hard code the health amount.
-		AttributeComp->ApplyHealthChange(-10.0f);
+		AttributeComp->ApplyHealthChange(GetInstigator(), - DamageAmount);
 		ExecuteEffect();
 		Destroy();
 	}

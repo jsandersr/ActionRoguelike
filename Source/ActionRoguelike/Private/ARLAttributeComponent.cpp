@@ -6,6 +6,17 @@
 
 static const float SHealthMax = 100.f;
 
+UARLAttributeComponent* UARLAttributeComponent::GetAttributeComponentFromActor(AActor* FromActor)
+{
+	return FromActor ? FromActor->FindComponentByClass<UARLAttributeComponent>() : nullptr;
+}
+
+bool UARLAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	UARLAttributeComponent* AttributeComp = GetAttributeComponentFromActor(Actor);
+	return AttributeComp && AttributeComp->IsAlive();
+}
+
 // Sets default values for this component's properties
 UARLAttributeComponent::UARLAttributeComponent()
 	: Health(SHealthMax)
@@ -13,15 +24,16 @@ UARLAttributeComponent::UARLAttributeComponent()
 {
 }
 
-bool UARLAttributeComponent::ApplyHealthChange(float DeltaHealth)
+bool UARLAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float DeltaHealth)
 {
-	float CurrentHealth = Health;
+	float OldHealth = Health;
 	Health = FMath::Clamp(Health + DeltaHealth, 0.0f, HealthMax);
 
-	bool bDidHealthChange = CurrentHealth != Health;
+	float ActualDeltaHealth = Health - OldHealth;
+	bool bDidHealthChange = ActualDeltaHealth != 0;
 	if (bDidHealthChange)
 	{
-		HealthChangedSignal.Broadcast(GetOwner(), this, Health, DeltaHealth);
+		HealthChangedSignal.Broadcast(InstigatorActor, this, Health, ActualDeltaHealth);
 	}
 
 	return bDidHealthChange;
@@ -38,4 +50,6 @@ void UARLAttributeComponent::HandleOnHealthChanged(AActor* InstigatorActor, UARL
 	float NewHealth, float DeltaHealth)
 {
 	// Example of how to connect to a delegate with a member function.
+	// If this event is used in blueprint, then this function will NOT be called unless the
+	// it is called from the blueprint.
 }

@@ -23,10 +23,14 @@ public:
 
 protected:
 	virtual void PostInitializeComponents() override;
+
 protected:
 
 	UFUNCTION()
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 		bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	float DamageAmount = 0.0f;
 };
