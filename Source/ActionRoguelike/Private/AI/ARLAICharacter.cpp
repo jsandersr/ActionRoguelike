@@ -2,14 +2,15 @@
 
 
 #include "AI/ARLAICharacter.h"
-#include "Perception/PawnSensingComponent.h"
 #include "AIController.h"
-#include "BehaviorTree/BlackboardComponent.h"
-#include "DrawDebugHelpers.h"
 #include "ARLAttributeComponent.h"
-#include "AIController.h"
-#include "BrainComponent.h"
 #include "ARLWorldUserWidget.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BrainComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "DrawDebugHelpers.h"
+#include "Perception/PawnSensingComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AARLAICharacter::AARLAICharacter()
@@ -21,6 +22,8 @@ AARLAICharacter::AARLAICharacter()
 	AttributeComp = CreateDefaultSubobject<UARLAttributeComponent>("AttributeComp");
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 void AARLAICharacter::ShowHealthBar()
@@ -66,6 +69,7 @@ void AARLAICharacter::OnHealthChanged(AActor* InstigatorActor, UARLAttributeComp
 
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
 
+		// Died.
 		if (NewHealth <= 0.0f)
 		{
 			AAIController* AIC = Cast<AAIController>(GetController());
@@ -79,6 +83,9 @@ void AARLAICharacter::OnHealthChanged(AActor* InstigatorActor, UARLAttributeComp
 
 
 			SetLifeSpan(10.0f);
+
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			GetCharacterMovement()->DisableMovement();
 		}
 		AAIController* AIC = Cast<AAIController>(GetController());
 		if (AIC)

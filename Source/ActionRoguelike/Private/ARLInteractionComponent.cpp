@@ -4,6 +4,9 @@
 #include "ARLInteractionComponent.h"
 #include "ARLGameplayInterface.h"
 
+static TAutoConsoleVariable<bool> CVarDrawDebugLinesEnabledInteraction(TEXT("arl.DrawDebugLinesEnabled_Interaction"),
+	false, TEXT("Enable Debug Lines for Interact Component."), ECVF_Cheat);
+
 // Sets default values for this component's properties
 UARLInteractionComponent::UARLInteractionComponent()
 {
@@ -15,6 +18,7 @@ UARLInteractionComponent::UARLInteractionComponent()
 
 void UARLInteractionComponent::PrimaryInteract()
 {
+	bool isDebugLinesEnabled = CVarDrawDebugLinesEnabledInteraction.GetValueOnGameThread();
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 
@@ -39,7 +43,10 @@ void UARLInteractionComponent::PrimaryInteract()
 		FQuat::Identity, ObjectQueryParams, SphereShape);
 
 	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-	DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0, 0, 2.0f);
+	if (isDebugLinesEnabled)
+	{
+		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0, 0, 2.0f);
+	}
 
 	// TODO: Maybe figure out a good way to determine a more intelligent way to assume what the user
 	// might be trying to target.
@@ -56,7 +63,10 @@ void UARLInteractionComponent::PrimaryInteract()
 	}
 
 	IARLGameplayInterface::Execute_Interact(Hit->GetActor(), Cast<APawn>(OwningCharacter));
-	DrawDebugSphere(GetWorld(), Hit->ImpactPoint, Radius, 32, LineColor, false, 2.0f);
+	if (isDebugLinesEnabled)
+	{
+		DrawDebugSphere(GetWorld(), Hit->ImpactPoint, Radius, 32, LineColor, false, 2.0f);
+	}
 }
 
 // Called when the game starts

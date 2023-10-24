@@ -22,19 +22,18 @@ public:
 	AARLCharacter();
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-protected:
+	UFUNCTION(Exec)
+	void HealSelf(float Amount = 100);
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+protected:
 
 	// Any sort of pregame hookups should be done here, not in the constructor.
 	virtual void PostInitializeComponents() override;
+
+	virtual FVector GetPawnViewLocation() const override;
 
 	// Moves character forward based on Value (which moves backward if negative).
 	void MoveForward(float Value);

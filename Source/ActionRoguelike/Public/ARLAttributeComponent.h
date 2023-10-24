@@ -45,6 +45,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool IsFullHealth() const { return Health >= HealthMax; }
 
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool Kill(AActor* InstigatorActor);
 
 public:
 	// Any sort of pregame hookups should be done here, not in the constructor.

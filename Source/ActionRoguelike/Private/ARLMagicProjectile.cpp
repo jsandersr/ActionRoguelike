@@ -6,6 +6,10 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "ARLAttributeComponent.h"
+#include "Utils/ARLGameplayFunctionLibrary.h"
+
+static TAutoConsoleVariable<float> CVarDirectionalForce(TEXT("arl.MagicProjectile.DirectionalForce"),
+	300000.f, TEXT("Amount of force from directional projectile."), ECVF_Cheat);
 
 // Sets default values
 AARLMagicProjectile::AARLMagicProjectile()
@@ -30,15 +34,23 @@ void AARLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 	if (!OtherActor || OtherActor == GetInstigator())
 		return;
 
-	UARLAttributeComponent* AttributeComp =
-		Cast<UARLAttributeComponent>(OtherActor->GetComponentByClass(UARLAttributeComponent::StaticClass()));
+	//UARLAttributeComponent* AttributeComp =
+	//	Cast<UARLAttributeComponent>(OtherActor->GetComponentByClass(UARLAttributeComponent::StaticClass()));
 
-	if (AttributeComp)
+	//if (AttributeComp)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Taking 20 damage"));
+	//	// TODO: don't hard code the health amount.
+	//	AttributeComp->ApplyHealthChange(GetInstigator(), - DamageAmount);
+	//	ExecuteEffect();
+	//	Destroy();
+	//}
+
+	float DirectionalForce = CVarDirectionalForce.GetValueOnGameThread();
+	if (UARLGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult, DirectionalForce))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Taking 20 damage"));
-		// TODO: don't hard code the health amount.
-		AttributeComp->ApplyHealthChange(GetInstigator(), - DamageAmount);
+		UE_LOG(LogTemp, VeryVerbose, TEXT("Taking %f damage"), DamageAmount);
+
 		ExecuteEffect();
-		Destroy();
 	}
 }

@@ -33,12 +33,6 @@ AARLCharacter::AARLCharacter()
 	bUseControllerRotationYaw = false;
 }
 
-// Called every frame
-void AARLCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 // Called to bind functionality to input
 void AARLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -58,10 +52,9 @@ void AARLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 }
 
-// Called when the game starts or when spawned
-void AARLCharacter::BeginPlay()
+void AARLCharacter::HealSelf(float Amount /*= 100*/)
 {
-	Super::BeginPlay();
+	AttributeComp->ApplyHealthChange(this, Amount);
 }
 
 void AARLCharacter::PostInitializeComponents()
@@ -69,6 +62,11 @@ void AARLCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	AttributeComp->HealthChangedSignal.AddDynamic(this, &AARLCharacter::OnHealthChanged);
+}
+
+FVector AARLCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();
 }
 
 void AARLCharacter::MoveForward(float Value)
