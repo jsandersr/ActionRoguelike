@@ -11,6 +11,7 @@ class UCameraComponent;
 class UARLInteractionComponent;
 class UAnimMontage;
 class UARLAttributeComponent;
+class UARLActionComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API AARLCharacter : public ACharacter
@@ -58,6 +59,10 @@ protected:
 
 	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 
+	void SprintStart();
+
+	void SprintStop();
+
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp,
 		float NewHealth, float DeltaHealth);
@@ -99,6 +104,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UARLAttributeComponent* AttributeComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UARLActionComponent* ActionComp = nullptr;
 
 private:
 	// The timer that will be used to trigger the primary attack.

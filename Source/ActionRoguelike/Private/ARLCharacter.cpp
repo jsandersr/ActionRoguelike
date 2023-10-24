@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ARLInteractionComponent.h"
 #include "ARLAttributeComponent.h"
+#include "ARLActionComponent.h"
 
 // Sets default values
 AARLCharacter::AARLCharacter()
@@ -25,6 +26,8 @@ AARLCharacter::AARLCharacter()
 
 	InteractionComp = CreateDefaultSubobject<UARLInteractionComponent>("InteractionComp");
 	AttributeComp = CreateDefaultSubobject<UARLAttributeComponent>("AttributeComp");
+	ActionComp = CreateDefaultSubobject<UARLActionComponent>("ActionComp");
+
 	GetMesh()->SetGenerateOverlapEvents(true);
 
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
@@ -50,6 +53,9 @@ void AARLCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("BlackHoleAbility", IE_Pressed, this, &AARLCharacter::UseBlackHoleAbility);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AARLCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AARLCharacter::SprintStop);
 }
 
 void AARLCharacter::HealSelf(float Amount /*= 100*/)
@@ -210,6 +216,16 @@ void AARLCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 	// Projectile class will be specified through a blueprint.
 	FTransform SpawnTransformMatrix = FTransform{ ProjectileRotation, TraceStart };
 	GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTransformMatrix, SpawnParams);
+}
+
+void AARLCharacter::SprintStart()
+{
+	ActionComp->StartActionByName(this, "Sprint");
+}
+
+void AARLCharacter::SprintStop()
+{
+	ActionComp->StopActionByName(this, "Sprint");
 }
 
 void AARLCharacter::OnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp, float NewHealth, float DeltaHealth)
