@@ -106,10 +106,7 @@ void AARLCharacter::MoveRight(float Value)
 
 void AARLCharacter::UsePrimaryAbility()
 {
-	PlayAnimMontage(AttackAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this,
-		&AARLCharacter::OnPrimaryAbility_TimeElapsed, PrimaryAttackAbilityDelaySeconds, false);
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 
 	// This is how you'd stop in-flight events from happening. You need its handle.
 	//GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack)

@@ -6,6 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "ARLAction.generated.h"
 
+class UWorld;
+
 /**
  * 
  */
@@ -22,11 +24,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	void StopAction(AActor* Instigator);
 
+	UWorld* GetWorld() const override;
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	FName ActionName;
 
-protected:
-	
 };

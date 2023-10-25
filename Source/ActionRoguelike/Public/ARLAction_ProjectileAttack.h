@@ -8,6 +8,7 @@
 
 class UAnimMontage;
 class UParticleSystem;
+class AARLCharacter;
 
 UCLASS()
 class ACTIONROGUELIKE_API UARLAction_ProjectileAttack : public UARLAction
@@ -15,23 +16,27 @@ class ACTIONROGUELIKE_API UARLAction_ProjectileAttack : public UARLAction
 	GENERATED_BODY()
 
 public:
-
+	UARLAction_ProjectileAttack();
+	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Ability")
+	UFUNCTION()
+	void AttackDelay_Elapsed(ACharacter* InstigatorCharacter);
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
 
-	UPROPERTY(EditAnywhere, Category = "Ability")
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "Ability")
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	FName HandSocketName;
 
-	UPROPERTY(EditAnywhere, Category = "Ability")
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	UParticleSystem* CastingEffect;
 
-	UPROPERTY(EditAnywhere, Category = "Ability")
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	float AnimDelaySeconds = 0.2f;
-
 
 };
