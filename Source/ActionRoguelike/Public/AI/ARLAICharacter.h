@@ -49,6 +49,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UARLAttributeComponent* AttributeComp = nullptr;
 
+	// 10:59 Adding action comp
+
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName = "HitTimestamp";
 

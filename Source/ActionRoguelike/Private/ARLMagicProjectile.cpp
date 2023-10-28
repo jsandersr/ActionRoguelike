@@ -8,6 +8,7 @@
 #include "ARLAttributeComponent.h"
 #include "ARLActionComponent.h"
 #include "Utils/ARLGameplayFunctionLibrary.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 static TAutoConsoleVariable<float> CVarDirectionalForce(TEXT("arl.MagicProjectile.DirectionalForce"),
 	300000.f, TEXT("Amount of force from directional projectile."), ECVF_Cheat);
@@ -47,11 +48,22 @@ void AARLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 	//	Destroy();
 	//}
 
+	// Key Note: This is another way to get a gameplay tag
+	// static FGameplayTag Tag = FGameplayTag::RequestGameplayTag("Status.Parrying");
+
 	// Key Note: This basically says, "Whatever actor this is, find and return a pointer to the first
 	// UARLActionComponent instance that you see on that actor.
 	// If we think there could be multiple, we should call GetComponentsByClass instead.
 	UARLActionComponent* ActionComp = Cast<UARLActionComponent>(
 		OtherActor->GetComponentByClass(UARLActionComponent::StaticClass()));
+
+	if (ActionComp && ActionComp->ActiveGameplayTags.HasTag(ParryTag))
+	{
+		MovementComp->Velocity = -MovementComp->Velocity;
+
+		SetInstigator(Cast<APawn>(OtherActor));
+		return;
+	}
 
 	float DirectionalForce = CVarDirectionalForce.GetValueOnGameThread();
 	if (UARLGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult, DirectionalForce))

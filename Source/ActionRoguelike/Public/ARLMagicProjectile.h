@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayTagContainer.h"
 #include "ARLProjectileBase.h"
 
 #include "ARLMagicProjectile.generated.h"
@@ -33,4 +34,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	float DamageAmount = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	FGameplayTag ParryTag;
 };
