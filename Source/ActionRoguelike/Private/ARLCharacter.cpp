@@ -112,107 +112,20 @@ void AARLCharacter::UsePrimaryAbility()
 	//GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack)
 }
 
-void AARLCharacter::OnPrimaryAbility_TimeElapsed()
-{
-	// Control location is "where are we looking"
-	//FTransform SpawnTransformMatrix = FTransform{ GetControlRotation(), HandLocation };
-
-	if (ensure(AttackAbilityProjectileClass))
-	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-		FTransform SpawnTM = FTransform{ GetControlRotation(), HandLocation };
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-
-		GetWorld()->SpawnActor<AActor>(AttackAbilityProjectileClass, SpawnTM, SpawnParams);
-	}
-	
-}
-
 void AARLCharacter::UseTeleportAbility()
 {
-	PlayAnimMontage(AttackAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_TeleportAbility, this,
-		&AARLCharacter::OnTeleportAbility_TimeElapsed, TeleportAbilityDelaySeconds, false);
-}
-
-void AARLCharacter::OnTeleportAbility_TimeElapsed()
-{
-	SpawnProjectile(TeleportAbilityProjectileClass);
+	ActionComp->StartActionByName(this, "Dash");
 }
 
 void AARLCharacter::UseBlackHoleAbility()
 {
-	PlayAnimMontage(AttackAnim);
-	GetWorldTimerManager().SetTimer(TimerHandle_BlackHoleAttack, this,
-		&AARLCharacter::OnBlackHoleAbility_TimeElapsed, BlackHoleAbilityDelaySeconds, false);
-}
-
-void AARLCharacter::OnBlackHoleAbility_TimeElapsed()
-{
-	SpawnProjectile(BlackHoleAbilityProjectileClass);
+	ActionComp->StartActionByName(this, "BlackHole");
 }
 
 void AARLCharacter::UsePrimaryInteract()
 {
 	ensureAlways(InteractionComp);
 	InteractionComp->PrimaryInteract();
-}
-
-void AARLCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
-{
-	if (!ensureAlways(ClassToSpawn))
-	{
-		return;
-	}
-
-	// This is so we don't have issues spawning inside of ourself.
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	FCollisionShape Shape;
-	Shape.SetSphere(20.0f);
-
-	//Ignore Player;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	FCollisionObjectQueryParams ObjParams;
-	ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-	ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
-	ObjParams.AddObjectTypesToQuery(ECC_Pawn);
-
-	FVector TraceStart = CameraComp->GetComponentLocation();
-
-	const float TraceLineLengthCM = 5000.0f;
-
-	// Endpoint far into the look-at distance. Not too far, still adjust somewhat towards the
-	// crosshair on a miss.
-	// TODO: Figure out how to introduce accuracy variations.
-	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * TraceLineLengthCM);
-
-	FHitResult HitResult;
-	// Returns true if we got a blocking hit.
-	if (GetWorld()->SweepSingleByObjectType(HitResult, TraceStart, TraceEnd,
-		FQuat::Identity, ObjParams, Shape, Params))
-	{
-		TraceEnd = HitResult.ImpactPoint;
-	}
-
-	// Now we trace from our hand location.
-	TraceStart = GetMesh()->GetSocketLocation("Muzzle_01");
-
-	// We will find a new direction/rotation that points from the hand to the impact point.
-	FRotator ProjectileRotation = FRotationMatrix::MakeFromX(TraceEnd - TraceStart).Rotator();
-
-	// Spawning is always done through the world.
-	// Projectile class will be specified through a blueprint.
-	FTransform SpawnTransformMatrix = FTransform{ ProjectileRotation, TraceStart };
-	GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTransformMatrix, SpawnParams);
 }
 
 void AARLCharacter::SprintStart()

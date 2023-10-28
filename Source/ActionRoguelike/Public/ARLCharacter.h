@@ -45,19 +45,11 @@ protected:
 	// Uses character's primary attack.
 	void UsePrimaryAbility();
 
-	void OnPrimaryAbility_TimeElapsed();
-
 	void UseTeleportAbility();
 	
-	void OnTeleportAbility_TimeElapsed();
-
 	void UseBlackHoleAbility();
 
-	void OnBlackHoleAbility_TimeElapsed();
-
 	void UsePrimaryInteract();
-
-	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 
 	void SprintStart();
 
@@ -68,28 +60,9 @@ protected:
 		float NewHealth, float DeltaHealth);
 
 protected:
-	// This is a projectile that we will spawn.
-	UPROPERTY(EditAnywhere, Category = "Ability")
-	TSubclassOf<AActor> AttackAbilityProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Ability")
-	TSubclassOf<AActor> TeleportAbilityProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Ability")
-	TSubclassOf<AActor> BlackHoleAbilityProjectileClass;
-
 	// This is the animation that will play when we attack.
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	UAnimMontage* AttackAnim = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = "Ability")
-	float PrimaryAttackAbilityDelaySeconds = 0.2f;
-
-	UPROPERTY(EditAnywhere, Category = "Ability")
-	float TeleportAbilityDelaySeconds = 0.2f;
-
-	UPROPERTY(EditAnywhere, Category = "Ability")
-	float BlackHoleAbilityDelaySeconds = 0.2f;
 
 	// Camera attaches to this.
 	UPROPERTY(VisibleAnywhere, Category = "Components")

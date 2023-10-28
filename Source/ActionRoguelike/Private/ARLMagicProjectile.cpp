@@ -6,6 +6,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "ARLAttributeComponent.h"
+#include "ARLActionComponent.h"
 #include "Utils/ARLGameplayFunctionLibrary.h"
 
 static TAutoConsoleVariable<float> CVarDirectionalForce(TEXT("arl.MagicProjectile.DirectionalForce"),
@@ -45,6 +46,12 @@ void AARLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 	//	ExecuteEffect();
 	//	Destroy();
 	//}
+
+	// Key Note: This basically says, "Whatever actor this is, find and return a pointer to the first
+	// UARLActionComponent instance that you see on that actor.
+	// If we think there could be multiple, we should call GetComponentsByClass instead.
+	UARLActionComponent* ActionComp = Cast<UARLActionComponent>(
+		OtherActor->GetComponentByClass(UARLActionComponent::StaticClass()));
 
 	float DirectionalForce = CVarDirectionalForce.GetValueOnGameThread();
 	if (UARLGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult, DirectionalForce))

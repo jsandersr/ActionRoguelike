@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 #include "ARLActionComponent.generated.h"
 
 class UARLAction;
+struct FGameplayTagContainer;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROGUELIKE_API UARLActionComponent : public UActorComponent
@@ -14,8 +16,14 @@ class ACTIONROGUELIKE_API UARLActionComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
+	FGameplayTagContainer ActiveGameplayTags;
+
 	// Sets default values for this actor's properties
 	UARLActionComponent();
+
+	virtual void BeginPlay();
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
 	void AddAction(TSubclassOf<UARLAction> ActionClass);
@@ -27,6 +35,9 @@ public:
 	bool StopActionByName(AActor* InstigatorActor, FName ActionName);
 
 protected:
+
+	UPROPERTY(EditAnywhere, Category = "Actions")
+	TArray<TSubclassOf<UARLAction>> DefaultActions;
 
 	UPROPERTY()
 	TArray<UARLAction*> Actions;
