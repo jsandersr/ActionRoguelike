@@ -41,6 +41,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UCurveFloat* DifficultyCurve = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Gameplay")
+	int32 CreditsPerKill = 0;
+
+
 	UFUNCTION()
 	void OnSpawnBotTimerElapsed();
 

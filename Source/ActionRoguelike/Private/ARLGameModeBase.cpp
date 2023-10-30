@@ -8,9 +8,19 @@
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "AI/ARLAICharacter.h"
 #include "ARLAttributeComponent.h"
+#include "Player/ARLPlayerState.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBotsEnabled(TEXT("arl.SpawnBotsEnabled"), true,
 	TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
+
+
+AARLGameModeBase::AARLGameModeBase()
+{
+	SpawnTimerInterval = 2.0f;
+
+	PlayerStateClass = AARLPlayerState::StaticClass();
+}
+
 
 void AARLGameModeBase::StartPlay()
 {
@@ -44,6 +54,16 @@ void AARLGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 
 		float RespawnDelay = 2.0f;
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, 2.0f, false);
+	}
+
+	APawn* KillerPawn = Cast<APawn>(Killer);
+	if (KillerPawn)
+	{
+		AARLPlayerState* PlayerState = KillerPawn->GetPlayerState<AARLPlayerState>();
+		if (PlayerState)
+		{
+			PlayerState->AddCredits(CreditsPerKill);
+		}
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
@@ -113,9 +133,4 @@ void AARLGameModeBase::RespawnPlayerElapsed(AController* Controller)
 
 		RestartPlayer(Controller);
 	}
-}
-
-AARLGameModeBase::AARLGameModeBase()
-{
-	SpawnTimerInterval = 2.0f;
 }

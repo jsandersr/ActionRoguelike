@@ -11,6 +11,7 @@
 #include "DrawDebugHelpers.h"
 #include "Perception/PawnSensingComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ARLActionComponent.h"
 
 // Sets default values
 AARLAICharacter::AARLAICharacter()
@@ -20,6 +21,7 @@ AARLAICharacter::AARLAICharacter()
 
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 	AttributeComp = CreateDefaultSubobject<UARLAttributeComponent>("AttributeComp");
+	ActionComp = CreateDefaultSubobject<UARLActionComponent>("ActionComp");
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);

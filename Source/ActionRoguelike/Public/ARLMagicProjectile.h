@@ -12,6 +12,7 @@
 class USphereComponent;
 class UProjectileMovementComponent;
 class UParticleSystemComponent;
+class UARLActionEffect;
 
 UCLASS()
 class ACTIONROGUELIKE_API AARLMagicProjectile : public AARLProjectileBase
@@ -37,4 +38,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	FGameplayTag ParryTag;
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	TSubclassOf<UARLActionEffect> BurningActionClass;
 };

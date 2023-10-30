@@ -6,9 +6,6 @@
 #include "ARLPowerupActor.h"
 #include "ARLPowerup_HealthPotion.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class ACTIONROGUELIKE_API AARLPowerup_HealthPotion : public AARLPowerupActor
 {

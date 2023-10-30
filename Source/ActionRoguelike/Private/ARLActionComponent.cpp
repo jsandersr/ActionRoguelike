@@ -4,6 +4,8 @@
 #include "ARLActionComponent.h"
 #include "ARLAction.h"
 
+#include <algorithm>
+
 // Sets default values for this component's properties
 UARLActionComponent::UARLActionComponent()
 {
@@ -20,7 +22,7 @@ void UARLActionComponent::BeginPlay()
 
 	for (TSubclassOf<UARLAction> ActionClass: DefaultActions)
 	{
-		AddAction(ActionClass);
+		AddAction(GetOwner(), ActionClass);
 	}
 }
 
@@ -33,29 +35,59 @@ void UARLActionComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
 }
 
-void UARLActionComponent::AddAction(TSubclassOf<UARLAction> ActionClass)
+void UARLActionComponent::AddAction(AActor* InstigatorActor, TSubclassOf<UARLAction> ActionToAdd)
 {
-	if (!ensure(ActionClass))
+	if (!ensure(ActionToAdd))
 	{
 		return;
 	}
 
-	UARLAction* NewAction = NewObject<UARLAction>(this, ActionClass);
+	UARLAction* NewAction = NewObject<UARLAction>(this, ActionToAdd);
 	if (ensure(NewAction))
 	{
 		Actions.Add(NewAction);
+
+		// TODO: Ideally we have an ensure around CanStart. But currently
+		// if you add BlockTags to the ActionEffect, it triggers. Will need
+		// a broader fix.
+		if (NewAction->bAutoStart && NewAction->CanStart(InstigatorActor))
+		{
+			NewAction->StartAction(InstigatorActor);
+		}
 	}
+}
+
+void UARLActionComponent::RemoveAction(UARLAction* ActionToRemove)
+{
+	if (!ensure(IsValid(ActionToRemove) && !ActionToRemove->IsRunning()))
+	{
+		return;
+	}
+
+	Actions.Remove(ActionToRemove);
 }
 
 bool UARLActionComponent::StartActionByName(AActor* InstigatorActor, FName ActionName)
 {
+	//Key note: You can use STL Algos but iterators are not well supported(nonexistent).
+	// You can use GetData() instead though.
+	//auto Found = std::find_if(Actions.GetData(), Actions.GetData() + Actions.Num(),
+	//	[&ActionName](UARLAction* CurrentAction)
+	//{
+	//	return IsValid(CurrentAction) && CurrentAction->ActionName == ActionName;
+	//});
+	//if (Found != Actions.GetData() + Actions.Num())
+	//{
+	//	return false;
+	//}
+
 	UARLAction** Action = Actions.FindByPredicate(
 		[&ActionName](UARLAction* CurrentAction)
 	{
 		return CurrentAction && CurrentAction->ActionName == ActionName;
 	});
 
-	if (Action && (*Action)->CanStart(InstigatorActor))
+	if (Action && IsValid(*Action) && (*Action)->CanStart(InstigatorActor))
 	{
 		(*Action)->StartAction(InstigatorActor);
 		return true;

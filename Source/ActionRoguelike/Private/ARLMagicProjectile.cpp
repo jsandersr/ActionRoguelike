@@ -9,6 +9,7 @@
 #include "ARLActionComponent.h"
 #include "Utils/ARLGameplayFunctionLibrary.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "ARLActionEffect.h"
 
 static TAutoConsoleVariable<float> CVarDirectionalForce(TEXT("arl.MagicProjectile.DirectionalForce"),
 	300000.f, TEXT("Amount of force from directional projectile."), ECVF_Cheat);
@@ -71,5 +72,10 @@ void AARLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 		UE_LOG(LogTemp, VeryVerbose, TEXT("Taking %f damage"), DamageAmount);
 
 		ExecuteEffect();
+
+		if (IsValid(ActionComp))
+		{
+			ActionComp->AddAction(GetInstigator(), BurningActionClass);
+		}
 	}
 }

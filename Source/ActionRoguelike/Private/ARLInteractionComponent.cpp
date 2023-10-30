@@ -3,6 +3,7 @@
 
 #include "ARLInteractionComponent.h"
 #include "ARLGameplayInterface.h"
+#include "ARLWorldUserWidget.h"
 
 static TAutoConsoleVariable<bool> CVarDrawDebugLinesEnabledInteraction(TEXT("arl.DrawDebugLinesEnabled_Interaction"),
 	false, TEXT("Enable Debug Lines for Interact Component."), ECVF_Cheat);
@@ -18,9 +19,29 @@ UARLInteractionComponent::UARLInteractionComponent()
 
 void UARLInteractionComponent::PrimaryInteract()
 {
+	if (!IsValid(FocusedActor))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No Focus Actor to interact");
+		return;
+	}
+
+	AActor* OwningCharacter = GetOwner();
+	IARLGameplayInterface::Execute_Interact(FocusedActor, Cast<APawn>(OwningCharacter));
+}
+
+// Called every frame
+void UARLInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	FindBestInteractable();
+}
+
+void UARLInteractionComponent::FindBestInteractable()
+{
 	bool isDebugLinesEnabled = CVarDrawDebugLinesEnabledInteraction.GetValueOnGameThread();
 	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	ObjectQueryParams.AddObjectTypesToQuery(CollisionChannel);
 
 	AActor* OwningCharacter = GetOwner();
 
@@ -28,17 +49,16 @@ void UARLInteractionComponent::PrimaryInteract()
 	FVector EyeLocation;
 	OwningCharacter->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
-	FVector End = EyeLocation + (EyeRotation.Vector() * 1000);
+	FVector End = EyeLocation + (EyeRotation.Vector() * TraceDistance);
 
 	// You could detect hit with a simple ray cast. But this requires the player be pixel perfect with their
 	// aiming.
 	//bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End,
 	//	ObjectQueryParams);
 
-	float Radius = 30.0f;
 	TArray<FHitResult> Hits;
 	FCollisionShape SphereShape;
-	SphereShape.SetSphere(Radius);
+	SphereShape.SetSphere(TraceRadius);
 	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End,
 		FQuat::Identity, ObjectQueryParams, SphereShape);
 
@@ -48,6 +68,7 @@ void UARLInteractionComponent::PrimaryInteract()
 		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0, 0, 2.0f);
 	}
 
+	FocusedActor = nullptr;
 	// TODO: Maybe figure out a good way to determine a more intelligent way to assume what the user
 	// might be trying to target.
 	FHitResult* Hit = Hits.FindByPredicate(
@@ -62,23 +83,34 @@ void UARLInteractionComponent::PrimaryInteract()
 		return;
 	}
 
-	IARLGameplayInterface::Execute_Interact(Hit->GetActor(), Cast<APawn>(OwningCharacter));
+	FocusedActor = Hit->GetActor();
+	if (FocusedActor)
+	{
+		if (!IsValid(DefaultWidgetInstance) && ensure(IsValid(DefaultWidgetClass)))
+		{
+			DefaultWidgetInstance = CreateWidget<UARLWorldUserWidget>(GetWorld(), DefaultWidgetClass);
+		}
+
+		if (DefaultWidgetInstance)
+		{
+			DefaultWidgetInstance->AttachedActor = FocusedActor;
+			if (!DefaultWidgetInstance->IsInViewport())
+			{
+				DefaultWidgetInstance->AddToViewport();
+			}
+		}
+	}
+	else
+	{
+		if (IsValid(DefaultWidgetInstance))
+		{
+			DefaultWidgetInstance->RemoveFromParent();
+		}
+	}
+
 	if (isDebugLinesEnabled)
 	{
-		DrawDebugSphere(GetWorld(), Hit->ImpactPoint, Radius, 32, LineColor, false, 2.0f);
+		DrawDebugSphere(GetWorld(), Hit->ImpactPoint, TraceRadius, 32, LineColor, false, 2.0f);
 	}
-}
-
-// Called when the game starts
-void UARLInteractionComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-
-// Called every frame
-void UARLInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 

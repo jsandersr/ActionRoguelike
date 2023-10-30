@@ -8,6 +8,7 @@
 
 class UPawnSensingComponent;
 class UARLAttributeComponent;
+class UARLActionComponent;
 class HealthBarWidgetClass;
 class UARLWorldUserWidget;
 
@@ -49,7 +50,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UARLAttributeComponent* AttributeComp = nullptr;
 
-	// 10:59 Adding action comp
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UARLActionComponent* ActionComp = nullptr;
 
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName = "HitTimestamp";

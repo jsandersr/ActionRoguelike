@@ -6,25 +6,40 @@
 #include "Components/ActorComponent.h"
 #include "ARLInteractionComponent.generated.h"
 
+class UARLWorldUserWidget;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROGUELIKE_API UARLInteractionComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-
 public:
 	// Sets default values for this component's properties
 	UARLInteractionComponent();
 
 	void PrimaryInteract();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+		FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	void FindBestInteractable();
 
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY()
+	AActor* FocusedActor = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UARLWorldUserWidget> DefaultWidgetClass;
+
+	UPROPERTY()
+	UARLWorldUserWidget* DefaultWidgetInstance = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	float TraceDistance = 500.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	float TraceRadius = 30.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	TEnumAsByte<ECollisionChannel> CollisionChannel = ECC_WorldDynamic;
 
 };

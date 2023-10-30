@@ -3,6 +3,7 @@
 
 #include "ARLPowerup_HealthPotion.h"
 #include "ARLAttributeComponent.h"
+#include "Player/ARLPlayerState.h"
 
 #include "Components/StaticMeshComponent.h"
 
@@ -26,9 +27,14 @@ void AARLPowerup_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 
 	if (ensure(AttributeComp) && !AttributeComp->IsFullHealth())
 	{
-		if (AttributeComp->ApplyHealthChange(this, AttributeComp->GetHealthMax()))
+		if (AARLPlayerState* PlayerState = InstigatorPawn->GetPlayerState<AARLPlayerState>())
 		{
-			HideAndCooldownPowerup();
+			// TODO: This will remove credits even if applying the health change fails.
+			if (PlayerState->RemoveCredits(CreditCost) &&
+				AttributeComp->ApplyHealthChange(this, AttributeComp->GetHealthMax()))
+			{
+				HideAndCooldownPowerup();
+			}
 		}
 	}
 }
