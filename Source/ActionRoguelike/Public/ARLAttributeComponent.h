@@ -62,12 +62,23 @@ protected:
 	// Category = "" display only for detail panels and blueprint context menu.
 
 	// Health of the owning actor.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float Health;
 
 	// Max health of the owning actor.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float HealthMax;
+
+	// Key note: We want to mark MulticastHealthChanged as unreliable because this RPC is
+	// basically just for cosmetic changes anyway. The actual properties are
+	// already successfully being replicated elsewhere. Also Reliable Multicasts ignore relevancy.
+
+	// key note: use multicast for transient events that happen in the moment and don't result
+	// in game/player state changes (so for cosmetic things). Use rep_notifys for state changes.
+
+	// TODO: ARLCharacter uses health value to disable input. Until we fix that this has to be Reliable.
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float DeltaHealth);
 
 private:
 	// Handles health change events. (NYI, just an example).

@@ -30,6 +30,8 @@ AARLProjectileBase::AARLProjectileBase()
 	MovementComp->ProjectileGravityScale = 0.0f;
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
+
+	//SetReplicates(true);
 }
 
 void AARLProjectileBase::OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
