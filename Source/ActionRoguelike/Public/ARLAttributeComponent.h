@@ -6,6 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "ARLAttributeComponent.generated.h"
 
+// TODO:
+// If you had multiple attributes (like rage, mana, etc), you can update any of them with a single
+// AttributeChanged rather than, OnHealthChanged, OnManaChanged, etc
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAttributeChangedSignal, AActor*, InstigatorActor, UARLAttributeComponent*, OwningComp, float, NewValue, float, DeltaValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FHealthChangedSignal, AActor*, InstigatorActor, UARLAttributeComponent*, OwningComp, float, NewHealth, float, DeltaHealth);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
