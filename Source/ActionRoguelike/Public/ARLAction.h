@@ -19,6 +19,7 @@ class ACTIONROGUELIKE_API UARLAction : public UObject
 {
 	GENERATED_BODY()
 
+//Functions
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	void StartAction(AActor* Instigator);
@@ -34,6 +35,9 @@ public:
 
 	UWorld* GetWorld() const override;
 
+	bool IsSupportedForNetworking() const override { return true; }
+
+// Fields
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	FName ActionName;
@@ -41,23 +45,30 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	bool bAutoStart = false;
 
+// Functions
 protected:
-
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	UARLActionComponent* GetOwningComponent() const;
 
+// Fields
 protected:
-
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer GrantedTags;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer BlockedTags;
 
+
+// Networking
+protected:
 	// Flag enforces only a single action at a time can ever run.
 	// If multiple actions should run at the same time, we should remove this
 	// and just utilize tags.
+	UPROPERTY(ReplicatedUsing="OnRep_IsRunningChanged")
 	bool bIsRunning = false;
+
+	UFUNCTION()
+	void OnRep_IsRunningChanged();
 
 private:
 	bool CanStartInternal() const;
