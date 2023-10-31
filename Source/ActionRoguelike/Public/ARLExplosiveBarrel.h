@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* MeshComp = nullptr;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	URadialForceComponent* RadialForceComp = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
