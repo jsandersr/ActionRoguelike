@@ -19,14 +19,9 @@ UARLInteractionComponent::UARLInteractionComponent()
 
 void UARLInteractionComponent::PrimaryInteract()
 {
-	if (!IsValid(FocusedActor))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No Focus Actor to interact");
-		return;
-	}
-
-	AActor* OwningCharacter = GetOwner();
-	IARLGameplayInterface::Execute_Interact(FocusedActor, Cast<APawn>(OwningCharacter));
+	// Key Note: We need to pass the actor in as a parameter to
+	// interact with UEs replication system. Let UE figure out whose focused actor this is.
+	ServerInteract(FocusedActor);
 }
 
 // Called every frame
@@ -34,7 +29,11 @@ void UARLInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FindBestInteractable();
+	APawn* PlayerPawn = Cast<APawn>(GetOwner());
+	if (PlayerPawn->IsLocallyControlled())
+	{
+		FindBestInteractable();
+	}
 }
 
 void UARLInteractionComponent::FindBestInteractable()
@@ -65,7 +64,7 @@ void UARLInteractionComponent::FindBestInteractable()
 	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
 	if (isDebugLinesEnabled)
 	{
-		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0, 0, 2.0f);
+		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0, 0, 0.0f);
 	}
 
 	FocusedActor = nullptr;
@@ -112,5 +111,21 @@ void UARLInteractionComponent::FindBestInteractable()
 	{
 		DrawDebugSphere(GetWorld(), Hit->ImpactPoint, TraceRadius, 32, LineColor, false, 2.0f);
 	}
+}
+
+void UARLInteractionComponent::ServerInteract_Implementation(AActor* CurrentFocusActor)
+{
+	if (!IsValid(CurrentFocusActor))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No Focus Actor to interact");
+		return;
+	}
+
+	AActor* OwningCharacter = GetOwner();
+
+	// Key Note:
+	// The syntax here is just part of the UE domain knowledge. "Its just how it works".
+	// Execute_<FunctionName>(<Actor that this should get called on>, <Param list>)
+	IARLGameplayInterface::Execute_Interact(CurrentFocusActor, Cast<APawn>(OwningCharacter));
 }
 

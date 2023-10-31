@@ -17,17 +17,8 @@ public:
 	// Sets default values for this actor's properties
 	AARLItemChest();
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-public:
 	UPROPERTY(EditAnywhere)
 	float TargetPitch = 0.0f;
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -35,6 +26,13 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* LidMesh = nullptr;
+
+	// KeyNote: // RepNotified is ReplicatedUsing
+	UPROPERTY(ReplicatedUsing="OnRep_LidOpened", BlueprintReadOnly)
+	bool bLidOpened = false;
+
+	UFUNCTION()
+	void OnRep_LidOpened();
 
 private:
 	// BlueprintNativeEvent expects <function name>_Implementation.

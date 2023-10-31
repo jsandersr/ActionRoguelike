@@ -24,6 +24,11 @@ public:
 protected:
 	void FindBestInteractable();
 
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(AActor* CurrentFocusActor);
+
+protected:
+
 	UPROPERTY()
 	AActor* FocusedActor = nullptr;
 
