@@ -10,7 +10,7 @@
 #include "ARLAttributeComponent.h"
 #include "Player/ARLPlayerState.h"
 
-static TAutoConsoleVariable<bool> CVarSpawnBotsEnabled(TEXT("arl.SpawnBotsEnabled"), true,
+static TAutoConsoleVariable<bool> CVarSpawnBotsEnabled(TEXT("arl.SpawnBotsEnabled"), false,
 	TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
 
