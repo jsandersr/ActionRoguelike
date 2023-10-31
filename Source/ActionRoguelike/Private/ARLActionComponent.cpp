@@ -13,7 +13,7 @@ UARLActionComponent::UARLActionComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	SetIsReplicatedByDefault(true);
 }
 
 void UARLActionComponent::BeginPlay()
@@ -89,6 +89,11 @@ bool UARLActionComponent::StartActionByName(AActor* InstigatorActor, FName Actio
 
 	if (Action && IsValid(*Action) && (*Action)->CanStart(InstigatorActor))
 	{
+		if (!GetOwner()->HasAuthority())
+		{
+			ServerStartAction(InstigatorActor, ActionName);
+		}
+
 		(*Action)->StartAction(InstigatorActor);
 		return true;
 	}
@@ -113,4 +118,9 @@ bool UARLActionComponent::StopActionByName(AActor* InstigatorActor, FName Action
 	}
 
 	return false;
+}
+
+void UARLActionComponent::ServerStartAction_Implementation(AActor* InstigatorActor, FName ActionName)
+{
+	StartActionByName(InstigatorActor, ActionName);
 }

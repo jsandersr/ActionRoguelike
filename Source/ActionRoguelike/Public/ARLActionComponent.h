@@ -39,6 +39,8 @@ public:
 	bool StopActionByName(AActor* InstigatorActor, FName ActionName);
 
 protected:
+	UFUNCTION(Server, Reliable)
+	void ServerStartAction(AActor* InstigatorActor, FName ActionName);
 
 	UPROPERTY(EditAnywhere, Category = "Actions")
 	TArray<TSubclassOf<UARLAction>> DefaultActions;
