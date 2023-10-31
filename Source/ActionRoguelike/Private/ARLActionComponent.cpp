@@ -86,6 +86,10 @@ void UARLActionComponent::RemoveAction(UARLAction* ActionToRemove)
 	Actions.Remove(ActionToRemove);
 }
 
+// TODO: Currently, the animation played is inconsistent between client/server.
+// If action happened on client, the server sees it in real time no matter how fast.
+// If it happens on server, the client only sees it after IsRunning has returned to false.
+// Investigate.
 bool UARLActionComponent::StartActionByName(AActor* InstigatorActor, FName ActionName)
 {
 	//Key note: You can use STL Algos but iterators are not well supported(nonexistent).
