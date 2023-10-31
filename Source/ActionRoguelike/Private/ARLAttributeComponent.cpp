@@ -72,10 +72,10 @@ void UARLAttributeComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	HealthChangedSignal.AddDynamic(this, &UARLAttributeComponent::HandleOnHealthChanged);
+	HealthChangedSignal.AddDynamic(this, &UARLAttributeComponent::OnHealthChanged);
 }
 
-void UARLAttributeComponent::HandleOnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp,
+void UARLAttributeComponent::OnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp,
 	float NewHealth, float DeltaHealth)
 {
 	// Example of how to connect to a delegate with a member function.

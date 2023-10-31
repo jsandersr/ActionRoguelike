@@ -72,6 +72,6 @@ protected:
 private:
 	// Handles health change events. (NYI, just an example).
 	UFUNCTION()
-	void HandleOnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp,
+	void OnHealthChanged(AActor* InstigatorActor, UARLAttributeComponent* OwningComp,
 		float NewHealth, float DeltaHealth);
 };
