@@ -21,7 +21,7 @@ AARLItemChest::AARLItemChest()
 	SetReplicates(true);
 }
 
-void AARLItemChest::OnRep_LidOpened()
+void AARLItemChest::OnRep_LidOpenedChanged()
 {
 	float CurrPitch = bLidOpened ? TargetPitch : 0.0f;
 	LidMesh->SetRelativeRotation(FRotator(CurrPitch, 0, 0));
@@ -38,7 +38,7 @@ void AARLItemChest::Interact_Implementation(APawn* InstigatorPawn)
 
 	// So this function is run on the SERVER. When implementing RepNotify in C++, the replication function
 	// is NOT automatically called on the server. So we need to call it here.
-	OnRep_LidOpened();
+	OnRep_LidOpenedChanged();
 }
 
 void AARLItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
