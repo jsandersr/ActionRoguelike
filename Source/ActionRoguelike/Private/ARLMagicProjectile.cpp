@@ -73,7 +73,7 @@ void AARLMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 
 		ExecuteEffect();
 
-		if (IsValid(ActionComp))
+		if (IsValid(ActionComp) && HasAuthority())
 		{
 			ActionComp->AddAction(GetInstigator(), BurningActionClass);
 		}

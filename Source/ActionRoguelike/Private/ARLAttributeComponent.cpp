@@ -46,24 +46,29 @@ bool UARLAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float De
 	}
 
 	float OldHealth = Health;
-	Health = FMath::Clamp(Health + DeltaHealth, 0.0f, HealthMax);
-
-	float ActualDeltaHealth = Health - OldHealth;
+	float NewHealth = FMath::Clamp(Health + DeltaHealth, 0.0f, HealthMax);
+	float ActualDeltaHealth = NewHealth - OldHealth;
 	bool bDidHealthChange = ActualDeltaHealth != 0;
-	if (bDidHealthChange)
-	{
-		//HealthChangedSignal.Broadcast(InstigatorActor, this, Health, ActualDeltaHealth);
 
-		// TODO: This is called for client and server. Figure out how to only call it on the server.
-		MulticastHealthChanged(InstigatorActor, Health, ActualDeltaHealth);
-	}
-
-	if (ActualDeltaHealth < 0.0f && Health == 0.0f)
+	// IsServer?
+	if (GetOwner()->HasAuthority())
 	{
-		AARLGameModeBase* GM = GetWorld()->GetAuthGameMode<AARLGameModeBase>();
-		if (GM)
+		Health = NewHealth;
+		if (bDidHealthChange)
 		{
-			GM->OnActorKilled(GetOwner(), InstigatorActor);
+			//HealthChangedSignal.Broadcast(InstigatorActor, this, Health, ActualDeltaHealth);
+
+			// TODO: This is called for client and server. Figure out how to only call it on the server.
+			MulticastHealthChanged(InstigatorActor, Health, ActualDeltaHealth);
+		}
+
+		if (ActualDeltaHealth < 0.0f && Health == 0.0f)
+		{
+			AARLGameModeBase* GM = GetWorld()->GetAuthGameMode<AARLGameModeBase>();
+			if (GM)
+			{
+				GM->OnActorKilled(GetOwner(), InstigatorActor);
+			}
 		}
 	}
 

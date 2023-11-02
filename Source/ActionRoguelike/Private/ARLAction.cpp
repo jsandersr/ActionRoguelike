@@ -16,7 +16,8 @@ void UARLAction::StartAction_Implementation(AActor* Instigator)
 	UARLActionComponent* Comp = GetOwningComponent();
 	Comp->ActiveGameplayTags.AppendTags(GrantedTags);
 
-	bIsRunning = true;
+	RepData.bIsRunning = true;
+	RepData.Instigator = Instigator;
 }
 
 void UARLAction::StopAction_Implementation(AActor* Instigator)
@@ -29,7 +30,8 @@ void UARLAction::StopAction_Implementation(AActor* Instigator)
 	UARLActionComponent* Comp = GetOwningComponent();
 	Comp->ActiveGameplayTags.RemoveTags(GrantedTags);
 
-	bIsRunning = false;
+	RepData.bIsRunning = false;
+	RepData.Instigator = Instigator;
 }
 
 bool UARLAction::CanStart_Implementation(AActor* Instigator)
@@ -48,15 +50,15 @@ UARLActionComponent* UARLAction::GetOwningComponent() const
 	return Cast<UARLActionComponent>(GetOuter());
 }
 
-void UARLAction::OnRep_IsRunningChanged()
+void UARLAction::OnRep_RepDataChanged()
 {
-	if (bIsRunning)
+	if (RepData.bIsRunning)
 	{
-		StartAction(nullptr);
+		StartAction(RepData.Instigator);
 	}
 	else
 	{
-		StopAction(nullptr);
+		StopAction(RepData.Instigator);
 	}
 }
 
@@ -70,5 +72,5 @@ void UARLAction::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UARLAction, bIsRunning);
+	DOREPLIFETIME(UARLAction, RepData);
 }

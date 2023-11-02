@@ -10,6 +10,20 @@
 class UWorld;
 class UARLActionComponent;
 
+// structs are always replicated
+USTRUCT()
+struct FActionRepData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	bool bIsRunning = false;
+
+	UPROPERTY()
+	AActor* Instigator = nullptr;
+};
+
 /**
  * 
  */
@@ -31,7 +45,7 @@ public:
 	bool CanStart(AActor* Instigator);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	bool IsRunning() const { return bIsRunning; }
+	bool IsRunning() const { return RepData.bIsRunning; }
 
 	UWorld* GetWorld() const override;
 
@@ -64,11 +78,13 @@ protected:
 	// Flag enforces only a single action at a time can ever run.
 	// If multiple actions should run at the same time, we should remove this
 	// and just utilize tags.
-	UPROPERTY(ReplicatedUsing="OnRep_IsRunningChanged")
-	bool bIsRunning = false;
+	UPROPERTY(ReplicatedUsing="OnRep_RepDataChanged")
+	FActionRepData RepData;
+
+	//bool bIsRunning = false;
 
 	UFUNCTION()
-	void OnRep_IsRunningChanged();
+	void OnRep_RepDataChanged();
 
 private:
 	bool CanStartInternal() const;

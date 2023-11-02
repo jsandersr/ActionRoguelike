@@ -44,24 +44,32 @@ void UARLActionComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 	for (UARLAction* Action : Actions)
 	{
 		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
-		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s : IsRunning %s : Outer: %s"),
+		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s"),
 			*GetNameSafe(GetOwner()),
-			*Action->ActionName.ToString(),
-			*LexToString(Action->IsRunning()),
-			*GetNameSafe(Action->GetOuter()));
+			*GetNameSafe(Action));
+			//*LexToString(Action->IsRunning()),
+			//*GetNameSafe(Action->GetOuter()));
 
 		LogOnScreen(this, ActionMsg, TextColor, 0.0f);
 	}
 }
 
-void UARLActionComponent::AddAction(AActor* InstigatorActor, TSubclassOf<UARLAction> ActionToAdd)
+void UARLActionComponent::AddAction(AActor* InstigatorActor, TSubclassOf<UARLAction> ActionClass)
 {
-	if (!ensure(ActionToAdd))
+	if (!ensure(ActionClass))
 	{
 		return;
 	}
 
-	UARLAction* NewAction = NewObject<UARLAction>(this, ActionToAdd);
+	// Skip for clients
+	if (!GetOwner()->HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client attempting to AddAction. [Class: %s]"),
+			*GetNameSafe(ActionClass));
+		return;
+	}
+
+	UARLAction* NewAction = NewObject<UARLAction>(this, ActionClass);
 	if (ensure(NewAction))
 	{
 		Actions.Add(NewAction);
