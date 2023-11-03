@@ -144,5 +144,7 @@ void AARLCharacter::OnHealthChanged(AActor* InstigatorActor, UARLAttributeCompon
 	{
 		APlayerController* PlayerController =  Cast<APlayerController>(GetController());
 		DisableInput(PlayerController);
+
+		SetLifeSpan(10.0f);
 	}
 }

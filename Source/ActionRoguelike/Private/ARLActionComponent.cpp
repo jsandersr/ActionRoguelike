@@ -142,8 +142,13 @@ bool UARLActionComponent::StopActionByName(AActor* InstigatorActor, FName Action
 		return CurrentAction && CurrentAction->ActionName == ActionName;
 	});
 
-	if (Action && (*Action)->IsRunning())
+	if (Action && IsValid(*Action) && (*Action)->IsRunning())
 	{
+		if (!GetOwner()->HasAuthority())
+		{
+			ServerStopAction(InstigatorActor, ActionName);
+		}
+
 		(*Action)->StopAction(InstigatorActor);
 		return true;
 	}
@@ -169,6 +174,11 @@ bool UARLActionComponent::ReplicateSubobjects(class UActorChannel* Channel,
 void UARLActionComponent::ServerStartAction_Implementation(AActor* InstigatorActor, FName ActionName)
 {
 	StartActionByName(InstigatorActor, ActionName);
+}
+
+void UARLActionComponent::ServerStopAction_Implementation(AActor* InstigatorActor, FName ActionName)
+{
+	StopActionByName(InstigatorActor, ActionName);
 }
 
 void UARLActionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

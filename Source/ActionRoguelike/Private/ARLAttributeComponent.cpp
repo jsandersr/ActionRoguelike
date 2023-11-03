@@ -87,6 +87,24 @@ void UARLAttributeComponent::InitializeComponent()
 	HealthChangedSignal.AddDynamic(this, &UARLAttributeComponent::OnHealthChanged);
 }
 
+void UARLAttributeComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	FTimerHandle TimerHandle;
+	FTimerDelegate TimerDel;
+	TimerDel.BindLambda([this]()
+	{
+		HealthChangedSignal.Broadcast(nullptr, this, 100, 0);
+	});
+	//GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, 5.0f, true);
+	HealthChangedSignal.Broadcast(nullptr, this, 100, 0);
+}
+
+void UARLAttributeComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
 void UARLAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float DeltaHealth)
 {
 	HealthChangedSignal.Broadcast(InstigatorActor, this, NewHealth, DeltaHealth);

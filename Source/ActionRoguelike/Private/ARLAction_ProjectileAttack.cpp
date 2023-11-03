@@ -22,6 +22,7 @@ void UARLAction_ProjectileAttack::StartAction_Implementation(AActor* InstigatorA
 		UGameplayStatics::SpawnEmitterAttached(CastingEffect, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
 
 		// TODO: don't want. This will cause lag.
+		// See: https://discord.com/channels/1101669599059128381/1111022727621509252/1169332138689187841
 		if (Character->HasAuthority())
 		{
 			FTimerHandle TimerHandle_AttackDelay;
@@ -59,7 +60,7 @@ void UARLAction_ProjectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorChar
 	ObjParams.AddObjectTypesToQuery(ECC_Pawn);
 
 	// TODO: Will this call the derived one on AARLCharacter?
-	FVector TraceStart = InstigatorCharacter->GetMesh()->GetSocketLocation(HandSocketName);
+	FVector TraceStart = InstigatorCharacter->GetPawnViewLocation();
 
 	const float TraceLineLengthCM = 5000.0f;
 

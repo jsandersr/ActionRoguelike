@@ -54,8 +54,9 @@ public:
 
 public:
 	// Any sort of pregame hookups should be done here, not in the constructor.
-	virtual void InitializeComponent() override;
-
+	void InitializeComponent() override;
+	void BeginPlay() override;
+	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 protected:
 	// EditAnywhere - edit in BP editor and per-instance level.
 	// VisibleAnywhere - 'read-only' in editor and level. (Use for Components)
