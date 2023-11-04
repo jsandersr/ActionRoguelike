@@ -7,6 +7,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCreditsChangedSignal, AARLPlayerState*, PlayerState,
 	int32, NewCredits, int32, Delta);
 
+
 UCLASS()
 class ACTIONROGUELIKE_API AARLPlayerState  : public APlayerState
 {
@@ -24,6 +25,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events");
 	FCreditsChangedSignal CreditsChangedSignal;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SavePlayerState(UARLSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void LoadPlayerState(UARLSaveGame* SaveObject);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Credits")

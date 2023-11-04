@@ -1,4 +1,5 @@
 #include "Player/ARLPlayerState.h"
+#include "ARLSaveGame.h"
 
 void AARLPlayerState::AddCredits(int32 Delta)
 {
@@ -26,4 +27,20 @@ bool AARLPlayerState::RemoveCredits(int32 Delta)
 	CreditsChangedSignal.Broadcast(this, Credits, -Delta);
 
 	return true;
+}
+
+void AARLPlayerState::SavePlayerState_Implementation(UARLSaveGame* SaveObject)
+{
+	if (IsValid(SaveObject))
+	{
+		SaveObject->Credits = Credits;
+	}
+}
+
+void AARLPlayerState::LoadPlayerState_Implementation(UARLSaveGame* SaveObject)
+{
+	if (IsValid(SaveObject))
+	{
+		Credits = SaveObject->Credits;
+	}
 }

@@ -27,6 +27,12 @@ void AARLItemChest::OnRep_LidOpenedChanged()
 	LidMesh->SetRelativeRotation(FRotator(CurrPitch, 0, 0));
 }
 
+void AARLItemChest::OnActorLoaded_Implementation()
+{
+	// Initialization code.
+	OnRep_LidOpenedChanged();
+}
+
 // THIS IS RUN FROM THE SERVER
 void AARLItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {

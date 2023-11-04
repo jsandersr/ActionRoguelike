@@ -9,6 +9,11 @@
 #include "AI/ARLAICharacter.h"
 #include "ARLAttributeComponent.h"
 #include "Player/ARLPlayerState.h"
+#include <Kismet/GameplayStatics.h>
+#include "ARLSaveGame.h"
+#include "GameFramework/GameStateBase.h"
+#include "ARLGameplayInterface.h"
+#include <Serialization/ObjectAndNameAsStringProxyArchive.h>
 
 static TAutoConsoleVariable<bool> CVarSpawnBotsEnabled(TEXT("arl.SpawnBotsEnabled"), false,
 	TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
@@ -22,6 +27,13 @@ AARLGameModeBase::AARLGameModeBase()
 }
 
 
+void AARLGameModeBase::InitGame(const FString& MapName, const FString& Options,
+	FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+	LoadSaveGame();
+}
+
 void AARLGameModeBase::StartPlay()
 {
 	Super::StartPlay();
@@ -30,6 +42,17 @@ void AARLGameModeBase::StartPlay()
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &AARLGameModeBase::OnSpawnBotTimerElapsed, SpawnTimerInterval, true);
 }
 
+
+void AARLGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+	
+	auto* PlayerState = NewPlayer->GetPlayerState<AARLPlayerState>();
+	if (IsValid(PlayerState))
+	{
+		PlayerState->LoadPlayerState(CurrentSaveGame);
+	}
+}
 
 void AARLGameModeBase::KillAllAI()
 {
@@ -67,6 +90,98 @@ void AARLGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
+}
+
+void AARLGameModeBase::WriteSaveGame()
+{
+	for (TObjectPtr<APlayerState> PlayerStatePtr : GameState->PlayerArray)
+	{
+		auto* PlayerState = Cast<AARLPlayerState>(PlayerStatePtr.Get());
+		if (IsValid(PlayerState))
+		{
+			PlayerState->SavePlayerState(CurrentSaveGame);
+		}
+	}
+
+	CurrentSaveGame->SavedActors.Empty();
+	for (AActor* Actor : TActorRange<AActor>(GetWorld()))
+	{
+		if (IsValid(Actor) && Actor->Implements<UARLGameplayInterface>())
+		{
+			FActorSaveData ActorData;
+			ActorData.ActorName = Actor->GetName();
+			ActorData.Transform = Actor->GetActorTransform();
+
+			// Pass the array to fill with data from actor.
+			FMemoryWriter MemWriter(ActorData.ByteData);
+
+			FObjectAndNameAsStringProxyArchive Archive(MemWriter, true);
+
+			// Tells the FMemoryWriter that we're only dealing with save game data.
+			// This will cause it to only consider UPROPERTY(SaveGame) fields.
+			Archive.ArIsSaveGame = true;
+
+			// Converts Actor's SaveGame UPROPERTYs into binary array.
+			Actor->Serialize(Archive);
+			
+			CurrentSaveGame->SavedActors.Add(ActorData);
+		}
+	}
+
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
+}
+
+void AARLGameModeBase::LoadSaveGame()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+	{
+		CurrentSaveGame = Cast<UARLSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+		if (!CurrentSaveGame)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame Data."));
+			return;
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Loaded SaveGame Data."));
+	}
+	else
+	{
+		CurrentSaveGame = Cast<UARLSaveGame>(
+			UGameplayStatics::CreateSaveGameObject(UARLSaveGame::StaticClass()));
+		UE_LOG(LogTemp, Log, TEXT("Created new SaveGame Data."));
+	}
+
+	// Look through all of the actors in the game (could be tens of thousands)
+	for (AActor* Actor : TActorRange<AActor>(GetWorld()))
+	{
+		// When we find one that's relevant, find saved data match and init the actor.
+		if (IsValid(Actor) && Actor->Implements<UARLGameplayInterface>())
+		{
+		// TODO figure out a TMap solution instead.
+			for (FActorSaveData ActorData : CurrentSaveGame->SavedActors)
+			{
+				if (ActorData.ActorName == Actor->GetName())
+				{
+					Actor->SetActorTransform(ActorData.Transform);
+
+
+					FMemoryReader MemReader(ActorData.ByteData);
+
+					FObjectAndNameAsStringProxyArchive Archive(MemReader, true);
+
+					Archive.ArIsSaveGame;
+					// Convert binary array back into actor's variables.
+					Actor->Serialize(Archive);
+
+					// Key Note: when we're using an interface like this, we use "I" but
+					// when casting, we use "U". eg. Actor->Implements<UARLGameplayInterface>()
+					IARLGameplayInterface::Execute_OnActorLoaded(Actor);
+
+					break;
+				}
+			}
+		}
+	}
 }
 
 void AARLGameModeBase::OnSpawnBotTimerElapsed()

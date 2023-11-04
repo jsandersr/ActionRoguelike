@@ -28,7 +28,7 @@ protected:
 	UStaticMeshComponent* LidMesh = nullptr;
 
 	// Key note: RepNotify - To run a function when a property changes, use ReplicatedUsing
-	UPROPERTY(ReplicatedUsing="OnRep_LidOpenedChanged", BlueprintReadOnly)
+	UPROPERTY(ReplicatedUsing="OnRep_LidOpenedChanged", BlueprintReadOnly, SaveGame)
 	bool bLidOpened = false;
 
 	UFUNCTION()
@@ -37,5 +37,6 @@ protected:
 private:
 	// BlueprintNativeEvent expects <function name>_Implementation.
 	void Interact_Implementation(APawn* InstigatorPawn);
+	void OnActorLoaded_Implementation();
 
 };

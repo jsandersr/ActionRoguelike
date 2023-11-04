@@ -10,6 +10,8 @@
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
+class UARLSaveGame;
+
 /**
  * 
  */
@@ -21,14 +23,33 @@ class ACTIONROGUELIKE_API AARLGameModeBase : public AGameModeBase
 public:
 	AARLGameModeBase();
 
-	virtual void StartPlay() override;
+	void InitGame(const FString& MapName, const FString& Options,
+		FString& ErrorMessage) override;
+
+	void StartPlay() override;
+
+	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
 	UFUNCTION(Exec)
 	void KillAllAI();
 
-	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
+	void OnActorKilled(AActor* VictimActor, AActor* Killer);
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void WriteSaveGame();
+
+	void LoadSaveGame();
 
 protected:
+	UFUNCTION()
+	void OnSpawnBotTimerElapsed();
+
+	UFUNCTION()
+	void OnSpawnBotQueryComplete(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	UFUNCTION()
+	void RespawnPlayerElapsed(AController* Controller);
+
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float SpawnTimerInterval = 0.0f;
 
@@ -44,15 +65,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Gameplay")
 	int32 CreditsPerKill = 0;
 
+	FString SlotName = "SaveGame01";
 
-	UFUNCTION()
-	void OnSpawnBotTimerElapsed();
-
-	UFUNCTION()
-	void OnSpawnBotQueryComplete(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
-
-	UFUNCTION()
-	void RespawnPlayerElapsed(AController* Controller);
+	UPROPERTY()
+	UARLSaveGame* CurrentSaveGame = nullptr;
 
 protected:
 	FTimerHandle TimerHandle_SpawnBots;
