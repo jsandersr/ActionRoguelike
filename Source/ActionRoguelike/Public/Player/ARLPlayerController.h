@@ -16,23 +16,37 @@ class ACTIONROGUELIKE_API AARLPlayerController : public APlayerController
 	GENERATED_BODY()
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> PauseMenuClass;
+
+	UPROPERTY()
+	UUserWidget* PauseMenuInstance = nullptr;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnPawnChangedSignal OnPawnChangedSignal;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerStateChangedSignal OnPlayerStateChangedSignal;
 
-	void SetPawn(APawn* InPawn) override;
-
-	// By default this function is not exposed to blueprint, so if we want to call it there
-	// we need to expose it ourselves.
-	void BeginPlayingState() override;
-
 	// For initializing things like UI  since BeginPlay is likely too early for scenarios like
 	// multiplayer clients, were not all data such as PlayerState has been received yet.
 	// Follow this pattern for GameState as well.
 	UFUNCTION(BlueprintImplementableEvent)
 	void BlueprintBeginPlayingState();
+
+	UFUNCTION(BlueprintCallable)
+	void TogglePauseMenu();
+
+protected:
+
+	void SetupInputComponent() override;
+
+	void SetPawn(APawn* InPawn) override;
+
+	// By default this function is not exposed to blueprint, so if we want to call it there
+	// we need to expose it ourselves.
+	void BeginPlayingState() override;
 
 	// They made the OnRep but didn't bother to make an event.
 	void OnRep_PlayerState() override;
