@@ -45,13 +45,15 @@ void AARLGameModeBase::StartPlay()
 
 void AARLGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
-	
 	auto* PlayerState = NewPlayer->GetPlayerState<AARLPlayerState>();
 	if (IsValid(PlayerState))
 	{
 		PlayerState->LoadPlayerState(CurrentSaveGame);
 	}
+
+	// call this after so we load as early as possible.
+	// This results in ::BeginPlayingState, which could make our init code run too late.
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }
 
 void AARLGameModeBase::KillAllAI()

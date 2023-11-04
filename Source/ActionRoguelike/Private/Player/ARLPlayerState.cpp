@@ -41,6 +41,6 @@ void AARLPlayerState::LoadPlayerState_Implementation(UARLSaveGame* SaveObject)
 {
 	if (IsValid(SaveObject))
 	{
-		Credits = SaveObject->Credits;
+		AddCredits(SaveObject->Credits);
 	}
 }
