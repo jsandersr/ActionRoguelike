@@ -21,4 +21,5 @@ protected:
 
 	public:
 	virtual void Interact_Implementation(APawn* Interactor) override;
+	FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
 };

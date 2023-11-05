@@ -38,6 +38,11 @@ void AARLPowerupActor::SetPowerupState(bool bNewIsActive)
 	RootComponent->SetVisibility(bNewIsActive, true);
 }
 
+FText AARLPowerupActor::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	return FText::GetEmpty();
+}
+
 void AARLPowerupActor::Interact_Implementation(APawn* InstigatorPawn)
 {
 	// logic in the derived classes...
