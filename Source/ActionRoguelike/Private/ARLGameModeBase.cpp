@@ -13,6 +13,9 @@
 #include "ARLSaveGame.h"
 #include "GameFramework/GameStateBase.h"
 #include "ARLGameplayInterface.h"
+#include "ARLMonsterData.h"
+#include "../ActionRoguelike.h"
+#include "ARLActionComponent.h"
 #include <Serialization/ObjectAndNameAsStringProxyArchive.h>
 
 static TAutoConsoleVariable<bool> CVarSpawnBotsEnabled(TEXT("arl.SpawnBotsEnabled"), false,
@@ -216,16 +219,18 @@ void AARLGameModeBase::OnSpawnBotTimerElapsed()
 		return;
 	}
 
-	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnBotQuery, this,
-		EEnvQueryRunMode::RandomBest5Pct, nullptr);
+	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this,
+		SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
 	if (ensure(QueryInstance))
 	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &AARLGameModeBase::OnSpawnBotQueryComplete);
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,
+			&AARLGameModeBase::OnSpawnBotQueryComplete);
 	}
 
 }
 
-void AARLGameModeBase::OnSpawnBotQueryComplete(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+void AARLGameModeBase::OnSpawnBotQueryComplete(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+	EEnvQueryStatus::Type QueryStatus)
 {
 	if (QueryStatus != EEnvQueryStatus::Success)
 	{
@@ -239,7 +244,33 @@ void AARLGameModeBase::OnSpawnBotQueryComplete(UEnvQueryInstanceBlueprintWrapper
 		return;
 	}
 	
-	GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
+	TArray<FMonsterInfoRow*> Rows;
+	MonsterTable->GetAllRows("SpawningMinions", Rows);
+
+	int32 RandomIndex = FMath::RandRange(0, Rows.Num() - 1);
+	FMonsterInfoRow* SelectedRow = Rows[RandomIndex];
+	
+	AActor* NewBot = GetWorld()->SpawnActor<AActor>(SelectedRow->MonsterData->MonsterClass,
+		Locations[0], FRotator::ZeroRotator);
+	if (!NewBot)
+	{
+		return;
+	}
+
+	LogOnScreen(this, FString::Printf(TEXT("Spawned enemy: %s (%s)"),
+		*GetNameSafe(NewBot), *GetNameSafe(SelectedRow->MonsterData)));
+
+	UARLActionComponent* ActionComp = Cast<UARLActionComponent>(
+			NewBot->GetComponentByClass(UARLActionComponent::StaticClass()));
+
+	if (IsValid(ActionComp))
+	{
+		for (TSubclassOf<UARLAction> ActionClass : SelectedRow->MonsterData->Actions)
+		{
+			ActionComp->AddAction(NewBot, ActionClass);
+		}
+	}
+
 }
 
 void AARLGameModeBase::RespawnPlayerElapsed(AController* Controller)

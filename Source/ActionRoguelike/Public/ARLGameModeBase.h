@@ -5,12 +5,37 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
+#include "Engine/DataTable.h"
+
 #include "ARLGameModeBase.generated.h"
 
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
 class UARLSaveGame;
+class UDataTable;
+class UARLMonsterData;
+
+// Every data table MUST define a struct for its row structure.
+USTRUCT(BlueprintType)
+struct FMonsterInfoRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+// Each of the fields in here will be a column in the data table.
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UARLMonsterData* MonsterData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Weight = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnCost = 5.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float KillReward = 20.0f;
+};
 
 /**
  * 
@@ -69,6 +94,9 @@ protected:
 
 	UPROPERTY()
 	UARLSaveGame* CurrentSaveGame = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UDataTable* MonsterTable = nullptr;
 
 protected:
 	FTimerHandle TimerHandle_SpawnBots;

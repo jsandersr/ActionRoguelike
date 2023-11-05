@@ -73,7 +73,7 @@ protected:
 	FGameplayTagContainer BlockedTags;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	UTexture2D* Icon = nullptr;
+	TSoftObjectPtr<UTexture2D> Icon = nullptr;
 
 // Networking
 protected:
