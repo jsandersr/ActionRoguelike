@@ -10,6 +10,9 @@
 class UARLAction;
 struct FGameplayTagContainer;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActionStateChangedSignal,
+	UARLActionComponent*, OwningComp, UARLAction*, Action);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROGUELIKE_API UARLActionComponent : public UActorComponent
 {
@@ -41,6 +44,12 @@ public:
 	bool ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch,
 		FReplicationFlags* RepFlags) override;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnActionStateChangedSignal OnActionStarted;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnActionStateChangedSignal OnActionStopped;
+
 protected:
 	UFUNCTION(Server, Reliable)
 	void ServerStartAction(AActor* InstigatorActor, FName ActionName);
@@ -51,6 +60,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Actions")
 	TArray<TSubclassOf<UARLAction>> DefaultActions;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	TArray<UARLAction*> Actions;
 };

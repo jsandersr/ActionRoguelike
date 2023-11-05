@@ -1,5 +1,6 @@
 #include "ARLActionEffect.h"
 #include "ARLActionComponent.h"
+#include "GameFramework/GameStateBase.h"
 
 UARLActionEffect::UARLActionEffect()
 {
@@ -9,31 +10,45 @@ UARLActionEffect::UARLActionEffect()
 	bAutoStart = true;
 }
 
+float UARLActionEffect::GetTimeRemainingSeconds() const
+{
+	AGameStateBase* GameState = GetWorld()->GetGameState<AGameStateBase>();
+	if (IsValid(GameState))
+	{
+		float EndTimeSeconds = TimeStartedSeconds + DurationSeconds;
+		return EndTimeSeconds - GameState->GetServerWorldTimeSeconds();
+	}
+
+	return DurationSeconds;
+}
+
 void UARLActionEffect::StartAction_Implementation(AActor* Instigator)
 {
 	Super::StartAction_Implementation(Instigator);
 
-	if (Duration > 0.0f)
+	if (DurationSeconds > 0.0f)
 	{
 		FTimerDelegate Delegate;
 		Delegate.BindUFunction(this, "StopAction", Instigator);
 
-		GetWorld()->GetTimerManager().SetTimer(DurationHandle, Delegate, Duration, false);
+		GetWorld()->GetTimerManager().SetTimer(DurationHandle, Delegate,
+			DurationSeconds, false);
 	}
 
-	if (Period > 0.0f)
+	if (PeriodSeconds > 0.0f)
 	{
 		FTimerDelegate Delegate;
 		Delegate.BindUFunction(this, "ExecutePeriodicEffect", Instigator);
 
-		GetWorld()->GetTimerManager().SetTimer(PeriodHandle, Delegate, Period, true);
+		GetWorld()->GetTimerManager().SetTimer(PeriodHandle, Delegate, PeriodSeconds, true);
 	}
 }
 
 void UARLActionEffect::StopAction_Implementation(AActor* Instigator)
 {
 	// Run this so we don't miss out on a last tick.
-	if (GetWorld()->GetTimerManager().GetTimerRemaining(PeriodHandle) < KINDA_SMALL_NUMBER)
+	if (GetWorld()->GetTimerManager().
+		GetTimerRemaining(PeriodHandle) < KINDA_SMALL_NUMBER)
 	{
 		ExecutePeriodicEffect(Instigator);
 	}

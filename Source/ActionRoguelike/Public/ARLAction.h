@@ -72,6 +72,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer BlockedTags;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	UTexture2D* Icon = nullptr;
 
 // Networking
 protected:
@@ -80,6 +82,9 @@ protected:
 	// and just utilize tags.
 	UPROPERTY(ReplicatedUsing="OnRep_RepDataChanged")
 	FActionRepData RepData;
+
+	UPROPERTY(Replicated)
+	float TimeStartedSeconds = 0.0f;
 
 	//bool bIsRunning = false;
 
