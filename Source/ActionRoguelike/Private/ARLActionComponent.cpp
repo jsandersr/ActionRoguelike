@@ -8,7 +8,10 @@
 #include "Net/UnrealNetwork.h"
 
 #include <algorithm>
-#include <Engine/ActorChannel.h>
+#include "Engine/ActorChannel.h"
+
+
+DECLARE_CYCLE_STAT(TEXT("StartActionByName"), STAT_StartActionByName, STATGROUP_STANFORD);
 
 // Sets default values for this component's properties
 UARLActionComponent::UARLActionComponent()
@@ -41,17 +44,18 @@ void UARLActionComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 	//FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple(true);
 	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
 
-	for (UARLAction* Action : Actions)
-	{
-		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
-		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s"),
-			*GetNameSafe(GetOwner()),
-			*GetNameSafe(Action));
-			//*LexToString(Action->IsRunning()),
-			//*GetNameSafe(Action->GetOuter()));
+	// Very, very expensive.
+	// for (UARLAction* Action : Actions)
+	// {
+	// 	FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
+	// 	FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s"),
+	// 		*GetNameSafe(GetOwner()),
+	// 		*GetNameSafe(Action));
+	// 		//*LexToString(Action->IsRunning()),
+	// 		//*GetNameSafe(Action->GetOuter()));
 
-		LogOnScreen(this, ActionMsg, TextColor, 0.0f);
-	}
+	// 	LogOnScreen(this, ActionMsg, TextColor, 0.0f);
+	// }
 }
 
 void UARLActionComponent::AddAction(AActor* InstigatorActor, TSubclassOf<UARLAction> ActionClass)
@@ -112,6 +116,8 @@ bool UARLActionComponent::StartActionByName(AActor* InstigatorActor, FName Actio
 	//	return false;
 	//}
 
+	SCOPE_CYCLE_COUNTER(STAT_StartActionByName);
+
 	UARLAction** Action = Actions.FindByPredicate(
 		[&ActionName](UARLAction* CurrentAction)
 	{
@@ -124,6 +130,8 @@ bool UARLActionComponent::StartActionByName(AActor* InstigatorActor, FName Actio
 		{
 			ServerStartAction(InstigatorActor, ActionName);
 		}
+
+		TRACE_BOOKMARK(TEXT("StartAction::%s"), *GetNameSafe(*Action));
 
 		(*Action)->StartAction(InstigatorActor);
 		return true;

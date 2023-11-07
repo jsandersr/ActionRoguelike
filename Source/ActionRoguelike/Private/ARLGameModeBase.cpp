@@ -17,8 +17,9 @@
 #include "../ActionRoguelike.h"
 #include "ARLActionComponent.h"
 #include <Serialization/ObjectAndNameAsStringProxyArchive.h>
+#include <Engine/AssetManager.h>
 
-static TAutoConsoleVariable<bool> CVarSpawnBotsEnabled(TEXT("arl.SpawnBotsEnabled"), false,
+static TAutoConsoleVariable<bool> CVarSpawnBotsEnabled(TEXT("arl.SpawnBotsEnabled"), true,
 	TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
 
@@ -250,27 +251,20 @@ void AARLGameModeBase::OnSpawnBotQueryComplete(UEnvQueryInstanceBlueprintWrapper
 	int32 RandomIndex = FMath::RandRange(0, Rows.Num() - 1);
 	FMonsterInfoRow* SelectedRow = Rows[RandomIndex];
 	
-	AActor* NewBot = GetWorld()->SpawnActor<AActor>(SelectedRow->MonsterData->MonsterClass,
-		Locations[0], FRotator::ZeroRotator);
-	if (!NewBot)
+	if (UAssetManager* AssetManager = UAssetManager::GetIfValid())
 	{
-		return;
+
+		LogOnScreen(this, FString::Printf(TEXT("Loading monster from id type=%s name=%s"),
+			*SelectedRow->MonsterId.PrimaryAssetType.ToString(),
+			*SelectedRow->MonsterId.PrimaryAssetName.ToString()), FColor::Cyan);
+
+		TArray<FName> Bundles;
+		FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(this, 
+			&AARLGameModeBase::OnMonsterLoaded, SelectedRow->MonsterId,
+			Locations[0]);
+
+		AssetManager->LoadPrimaryAsset(SelectedRow->MonsterId, Bundles, Delegate);
 	}
-
-	LogOnScreen(this, FString::Printf(TEXT("Spawned enemy: %s (%s)"),
-		*GetNameSafe(NewBot), *GetNameSafe(SelectedRow->MonsterData)));
-
-	UARLActionComponent* ActionComp = Cast<UARLActionComponent>(
-			NewBot->GetComponentByClass(UARLActionComponent::StaticClass()));
-
-	if (IsValid(ActionComp))
-	{
-		for (TSubclassOf<UARLAction> ActionClass : SelectedRow->MonsterData->Actions)
-		{
-			ActionComp->AddAction(NewBot, ActionClass);
-		}
-	}
-
 }
 
 void AARLGameModeBase::RespawnPlayerElapsed(AController* Controller)
@@ -280,5 +274,40 @@ void AARLGameModeBase::RespawnPlayerElapsed(AController* Controller)
 		Controller->UnPossess();
 
 		RestartPlayer(Controller);
+	}
+}
+
+void AARLGameModeBase::OnMonsterLoaded(FPrimaryAssetId LoadedId, FVector SpawnLocation)
+{
+	UARLMonsterData* MonsterData = nullptr;
+	if (UAssetManager* AssetManager = UAssetManager::GetIfValid())
+	{
+		MonsterData = Cast<UARLMonsterData>(AssetManager->GetPrimaryAssetObject(LoadedId));
+		if (!MonsterData)
+		{
+			return;
+		}
+
+		LogOnScreen(this, "MonsterData loaded...", FColor::Green);
+	}
+
+	AActor* NewBot = GetWorld()->SpawnActor<AActor>(MonsterData->MonsterClass, SpawnLocation, FRotator::ZeroRotator);
+	if (!NewBot)
+	{
+		return;
+	}
+
+	LogOnScreen(this, FString::Printf(TEXT("Spawned enemy: %s (%s)"),
+		*GetNameSafe(NewBot), *GetNameSafe(MonsterData)));
+
+	UARLActionComponent* ActionComp = Cast<UARLActionComponent>(
+		NewBot->GetComponentByClass(UARLActionComponent::StaticClass()));
+
+	if (IsValid(ActionComp))
+	{
+		for (TSubclassOf<UARLAction> ActionClass : MonsterData->Actions)
+		{
+			ActionComp->AddAction(NewBot, ActionClass);
+		}
 	}
 }

@@ -22,6 +22,8 @@ AARLMagicProjectile::AARLMagicProjectile()
 	// Only interested in overlapping with pawn example:
 	// SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	MovementComp->InitialSpeed = 3000.0f;
+
+	InitialLifeSpan = 10.0f;
 }
 
 void AARLMagicProjectile::PostInitializeComponents()

@@ -25,7 +25,7 @@ struct FMonsterInfoRow : public FTableRowBase
 // Each of the fields in here will be a column in the data table.
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UARLMonsterData* MonsterData;
+	FPrimaryAssetId MonsterId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Weight = 1.0f;
@@ -101,4 +101,6 @@ protected:
 protected:
 	FTimerHandle TimerHandle_SpawnBots;
 
+private:
+	void OnMonsterLoaded(FPrimaryAssetId LoadedId, FVector SpawnLocation);
 };
